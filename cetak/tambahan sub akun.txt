@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS t_tw (
+  kdtw char(1) NOT NULL,
+  nmtw char(3) NOT NULL
+); 
+DELETE FROM t_tw;
+INSERT INTO t_tw (kdtw, nmtw) VALUES
+('1', 'I'),
+('2', 'II'),
+('3', 'III'),
+('4', 'IV');

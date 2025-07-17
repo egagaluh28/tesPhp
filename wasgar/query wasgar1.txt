@@ -1,0 +1,67 @@
+select a.kdsakun as display, b.nmsakun as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, '' as notgl_p3, sum(c.p3) as p3,
+'' as notgl_npb, d.npb, e.spp from pagu a
+left join t_sakun b on  a.kdgiat=b.kdgiat and a.kdoutput=b.kdoutput and a.kdakun=b.kdakun and a.kdsakun=b.kdsakun
+left join (select id_pagu,sum(nilai_p3) as p3 from p3 group by id_pagu) as c on a.id_pagu=c.id_pagu 
+left join (select id_pagu,sum(nilai_npb) as npb from npb group by id_pagu) as d on (a.id_pagu=d.id_pagu) 
+left join (select id_pagu,sum(nilai_spp) as spp from spp group by id_pagu) as e on a.id_pagu=e.id_pagu 
+where a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	='511237' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' group by a.kdsakun
+
+
+SELECT a.kdsakun as display, b.nmsakun as uraian, '' as pagu, '' as revisi, '' as pagurevisi,
+'' as nop3,  sum(c.nilai_p3) as jmlp3,
+'' as nonpb, sum(d.nilai_spp) as jmlwabku, (sum(c.nilai_p3) - sum(d.nilai_spp)) as sisaang
+from pagu a left join t_sakun b on a.kdgiat=b.kdgiat and a.kdoutput=b.kdoutput and a.kdakun=b.kdakun and a.kdsakun=b.kdsakun
+left join p3 c on a.id_pagu=c.id_pagu
+left join spp d on a.id_pagu=d.id_pagu and c.id_p3=d.id_p3
+where a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	='511237' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' group by a.kdsakun
+	  
+union( SELECT concat(a.kdsakun,a.urutitem) as display, a.nmitem as uraian, a.pagu, a.revisi, (a.pagu+a.revisi) as pagurevisi,
+'' as nop3,  sum(c.nilai_p3) as jmlp3,
+'' as nonpb, sum(d.nilai_spp) as jmlwabku, (sum(c.nilai_p3) - sum(d.nilai_spp)) as sisaang
+from pagu a
+left join p3 c on a.id_pagu=c.id_pagu
+left join spp d on a.id_pagu=d.id_pagu and c.id_p3=d.id_p3
+where a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	=' 511237' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' group by  a.id_pagu)	  
+	  
+union( SELECT concat(a.kdsakun,a.urutitem, c.nop3) as display, '' as uraian, '' as pagu, '' as revisi, '' as pagurevisi,
+c.nop3,  c.nilai_p3 as jmlp3,
+'' as nonpb, d.nilai_spp as jmlwabku, (c.nilai_p3 - d.nilai_spp) as sisaang
+from pagu a
+left join p3 c on a.id_pagu=c.id_pagu
+left join spp d on a.id_pagu=d.id_pagu and c.id_p3=d.id_p3
+where a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	=' 511237' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' group by a.kdsakun, c.id_p3)
+	  
+union( SELECT concat(a.kdsakun,a.urutitem, c.nop3, c.id_p3) as display, '' as uraian, '' as pagu, '' as revisi, '' as pagurevisi,
+c.tglp3 as nop3, '' as jmlp3,
+'' as nonpb, '' as jmlwabku, '' as sisaang
+from pagu a
+left join p3 c on a.id_pagu=c.id_pagu
+left join spp d on a.id_pagu=d.id_pagu and c.id_p3=d.id_p3
+where a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	=' 511237' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' group by a.kdsakun, c.id_p3)	  
+	  
+order by display

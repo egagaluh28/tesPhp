@@ -1,0 +1,5 @@
+<script language="JavaScript">;
+document.location='<? print ".././media.php?module=realisasi_akuncovid_yanmasum_ktm&kdbulan=$_GET[kdbulan]&thang=$_GET[thang]"; ?>'
+</script>
+
+

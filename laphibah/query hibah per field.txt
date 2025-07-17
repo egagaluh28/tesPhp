@@ -1,0 +1,3 @@
+select a.thang, a.kdkotama, a.kdsatker, a.pemberi_hibah, a.no_nph, a.tgl_nph, a.uraian, a.nilai_hibah, a.no_reg, a.batas_tarik_dana, a.no_rek, a.no_rev_dipa, a.nilai_revisi, a.no_sphl, a.tgl_sphl, a.nilai_sphl, a.no_sp3hl, a.tgl_sp3hl, a.nilai_sp3hl, b.nmsatkr from laphibah a left join t_satkr b on a.kdkotama=b.kdkotama and a.kdsatker=b.kdsatkr where a.kdkotama='25'  and a.thang='2019'
+
+

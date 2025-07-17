@@ -1,0 +1,57 @@
+SELECT a.kdsakun as display, a.nmsakun as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi,
+'' as nop3,   sum(c.p3) as p3,  
+'' as nonpb, sum(d.npb) as npb, sum(e.spp) as spp from pagu a
+left join (select id_pagu,sum(nilai_p3) as p3 from p3 where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_pagu) as c on a.id_pagu=c.id_pagu 
+left join (select id_pagu,sum(nilai_npb) as npb from npb where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_pagu) as d on a.id_pagu=d.id_pagu
+left join (select id_pagu,sum(nilai_spp) as spp from spp where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_pagu) as e on a.id_pagu=e.id_pagu 
+where a.kdsa		= '1' and
+	  a.kdprogram	='14' and
+	  a.kdgiat   	='1444' and
+	  a.kdoutput   	='001' and
+	  a.kdakun   	='521119' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='06' and
+	  a.thang		='2017' group by a.kdsakun
+	  
+union(SELECT concat(a.kdsakun,a.urutitem) as display, a.nmitem as uraian, a.pagu, a.revisi, a.pagurevisi,
+'' as nop3,   sum(c.p3) as p3,  
+'' as nonpb, sum(d.npb) as npb, sum(e.spp) as spp from pagu a
+left join (select id_pagu,sum(nilai_p3) as p3 from p3 where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_pagu) as c on a.id_pagu=c.id_pagu 
+left join (select id_pagu,sum(nilai_npb) as npb from npb where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_pagu) as d on a.id_pagu=d.id_pagu
+left join (select id_pagu,sum(nilai_spp) as spp from spp where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_pagu) as e on a.id_pagu=e.id_pagu 
+where a.kdsa		= '1' and
+	  a.kdprogram	='14' and
+	  a.kdgiat   	='1444' and
+	  a.kdoutput   	='001' and
+	  a.kdakun   	='521119' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='06' and
+	  a.thang		='2017' group by  a.id_pagu)	  
+	  
+union(SELECT concat(a.kdsakun,a.urutitem, a.id_pagu,c.id_p3,id_npb) as display, '' as uraian, '' as pagu, '' as revisi, '' as pagurevisi,
+c.nop3,  c.p3, d.nonpb, d.npb, e.spp from pagu a
+left join (select id_pagu, kdbulan, id_p3, nop3, nilai_p3 as p3 from p3 where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_p3) as c on a.id_pagu=c.id_pagu 
+left join (select id_pagu, kdbulan, id_npb, nonpb, nilai_npb as npb from npb where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_p3,id_npb) as d on a.id_pagu=d.id_pagu
+left join (select id_pagu,nilai_spp as spp from spp where kdbulan<='09' and kdkotama='05' and kdsatker='06' and thang='2017' group by id_p3,id_npb,id_spp) as e on a.id_pagu=e.id_pagu 
+where a.kdsa		= '1' and
+	  a.kdprogram	='14' and
+	  a.kdgiat   	='1444' and
+	  a.kdoutput   	='001' and
+	  a.kdakun   	='521119' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='06' and
+	  a.thang		='2017' group by a.kdsakun, c.id_p3, d.id_npb)
+	  
+union( SELECT concat(a.kdsakun,a.urutitem, c.nop3, c.id_p3) as display, '' as uraian, '' as pagu, '' as revisi, '' as pagurevisi,
+c.tglp3 as nop3, '' as jmlp3,
+'' as nonpb, '' as  jmlnpb,'' as jmlwabku, '' as sisaang
+from pagu a
+left join p3 c on a.id_pagu=c.id_pagu
+left join spp d on a.id_pagu=d.id_pagu and c.id_p3=d.id_p3
+where a.kdsa		= '$_GET[kdsa]' and
+	  a.kdprogram	='$_GET[kdprogram]' and
+	  a.kdgiat   	='$_GET[kdgiat]' and
+	  a.kdoutput   	='$_GET[kdoutput]' and
+	  a.kdakun   	='$_GET[kdakun]' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='06' group by a.kdsakun, c.id_p3

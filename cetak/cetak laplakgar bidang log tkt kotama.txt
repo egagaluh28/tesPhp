@@ -1,0 +1,57 @@
+select concat('012.','22.',a.kdprogram) as kode, concat(a.kdprogram) as display, '' as kdsatker, b.nmprogram as uraian,
+sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, c.sppini, c.realsini
+from dipa a 
+left join t_program b on a.kdprogram=b.kdprogram
+left join (select kdprogram, kdkotama, kdsatker, thang, sum(nilai_spp) as sppini, sum(realisasi) as realsini from realisasi where kdbulan<='01' and kdkotama='06'  and thang='2020' and kdwasgiat='04' group by kdprogram) as c on a.kdprogram=c.kdprogram
+where a.kdkotama='06'  and a.thang='2020' and a.kdwasgiat='04'
+group by a.kdprogram
+
+union
+(select a.kdgiat as kode, concat(a.kdprogram,a.kdgiat) as display, '' as kdsatker, b.nmgiat as uraian,
+sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi,  c.sppini, c.realsini
+from dipa a 
+left join t_giat b on a.kdgiat=b.kdgiat
+left join (select kdprogram, kdgiat, kdkotama, kdsatker, thang, sum(nilai_spp) as sppini, sum(realisasi) as realsini  from realisasi  where kdbulan<='01' and kdkotama='06'  and thang='2020'  and kdwasgiat='04' group by kdprogram,kdgiat) as c on  a.kdprogram=c.kdprogram and a.kdgiat=c.kdgiat
+where a.kdkotama='06'  and a.thang='2020'  and a.kdwasgiat='04'
+group by a.kdprogram,a.kdgiat)
+
+union
+(select a.kdoutput as kode, concat(a.kdprogram,a.kdgiat,a.kdoutput) as display,  '' as kdsatker, b.nmoutput as uraian,
+sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, c.sppini, c.realsini
+from dipa a 
+left join t_output b on a.kdgiat=b.kdgiat and a.kdoutput=b.kdoutput
+left join (select kdprogram, kdgiat, kdoutput, kdkotama, kdsatker, thang, sum(nilai_spp) as sppini, sum(realisasi) as realsini from  realisasi  where kdbulan<='01' and kdkotama='06'  and thang='2020'  and kdwasgiat='04' group by kdprogram,kdgiat,kdoutput) as c on  a.kdprogram=c.kdprogram and a.kdgiat=c.kdgiat and a.kdoutput=c.kdoutput 
+where a.kdkotama='06'  and a.thang='2020'  and a.kdwasgiat='04'
+group by a.kdprogram,a.kdgiat,a.kdoutput)
+
+union
+(select a.kdakun as kode, concat(a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun) as display,  '' as kdsatker, b.nmakun as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, c.sppini, c.realsini
+from dipa a 
+left join t_akun b on a.kdakun=b.kdakun
+left join (select kdprogram, kdgiat, kdoutput, kdakun, kdkotama, kdsatker, thang, sum(nilai_spp) as sppini, sum(realisasi) as realsini from realisasi  where kdbulan<='01' and kdkotama='06'  and thang='2020'  and kdwasgiat='04' group by kdprogram,kdgiat,kdoutput,kdakun) as c on  a.kdprogram=c.kdprogram and a.kdgiat=c.kdgiat and a.kdoutput=c.kdoutput and a.kdakun=c.kdakun 
+where a.kdkotama='06'  and a.thang='2020'  and a.kdwasgiat='04'
+group by a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun)
+
+
+union
+(select '' as kode, concat(a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun,a.kdsatker) as display,  a.kdsatker, b.nmsatkr as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, c.sppini, c.realsini
+from dipa a 
+left join t_satkr b on a.kdsatker=b.kdsatkr
+left join (select kdprogram, kdgiat, kdoutput, kdakun, kdkotama, kdsatker, thang, sum(nilai_spp) as sppini, sum(realisasi) as realsini from realisasi  where kdbulan<='01' and kdkotama='06'  and thang='2020'  and kdwasgiat='04' group by kdprogram,kdgiat,kdoutput,kdakun) as c on  a.kdprogram=c.kdprogram and a.kdgiat=c.kdgiat and a.kdoutput=c.kdoutput and a.kdakun=c.kdakun 
+where a.kdkotama='06'  and a.thang='2020'  and a.kdwasgiat='04'
+group by a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun,kdsatker)
+
+
+
+
+union
+(select '' as kode, concat(a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun,a.kdsatker, a.kdsakun) as display,  '' as kdsatker, concat('- ',a.nmsakun) as uraian,
+sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, c.sppini, c.realsini
+from dipa a 
+
+left join (select  kdprogram, kdgiat, kdoutput, kdakun, kdsakun, kdkotama, kdsatker, thang,sum(nilai_spp) as sppini, sum(realisasi) as realsini from  realisasi  where kdbulan<='01' and kdkotama='06'  and thang='2020'  and kdwasgiat='04' group by kdprogram,kdgiat, kdoutput, kdakun,kdsakun,kdsatker) as c on  a.kdprogram=c.kdprogram and a.kdgiat=c.kdgiat and a.kdoutput=c.kdoutput and a.kdakun=c.kdakun and a.kdsakun=c.kdsakun and a.kdsatker=c.kdsatker
+
+where a.kdkotama='06'  and a.thang='2020'  and a.kdwasgiat='04'
+group by a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun, a.kdsakun, a.kdsatker)
+
+order by display

@@ -1,0 +1,166 @@
+
+
+<html>
+<head>
+
+<link rel="stylesheet" href="library/style_table.css" type="text/css" media="screen" />
+
+
+<?php  error_reporting(0);
+		 $satkr = mysql_query("select * from t_satkr   where kdkotama='$_GET[kdkotama]' and kdsatkr='$_GET[kdsatker]'");
+		 $y   = mysql_fetch_array($satkr);
+		
+     
+		 
+	 
+   
+print "<br><table  width='1100' align='center' ><tr><td class='judulsubcontent' align='center'>RENCANA KEBUTUHAN GAJI DAN TUNJANGAN SERTA TUNJANGAN KINERJA TA $_GET[thang]</td></tr></table>";	
+
+
+$query = "select a.kdakun, a.nmakun, b.aidi, b.kdkotama, b.kdsatker, b.thang, b.jandes, b.gaji13, b.gaji14, b.ket
+from t_akun_gaji a 
+left join (select * from renbut where kdkotama='$_SESSION[kdkotama]' and kdsatker='$_SESSION[kdsatker]' and thang='$_GET[thang]') as b on a.kdakun=b.kdakun order by a.kdakun ";
+		$ok = mysql_query($query);
+ 
+print "<div class='codehim-tombol-biru'><table width='85%' align='center'  ><tr>
+	
+				<td class='subyek1'>
+				<form name='form1' method='GET'  action='renbut/kirimparameter.php' >
+				<input type='hidden'  name='kdkotama'   class='roundedisi'  value='$_SESSION[kdkotama]' />
+				<input type='hidden'  name='kdsatker'   class='roundedisi'  value='$_SESSION[kdsatker]' />";
+				
+	print "TAHUN : <select name='thang' class='sendiri'  onchange='this.form.submit();'>
+									  <option value='' selected>- - Pilih - -</option>";
+									  for ($thn=2024;$thn<=2030;$thn++){
+									  if ($thn==$_GET[thang])
+										echo "<option value=$thn selected>$thn</option>";
+									  else
+                                        echo "<option value=$thn>$thn</option>";									  
+									  }
+									  echo "</select>";	
+	
+	if ($_GET[thang]<>'') {	 
+	print "&nbsp;&nbsp;<a href='media.php?module=inputrenbut&thang=$_GET[thang]' style='text-decoration:none'><input  type='button' value='Tambah Data' />";
+	} else { print ""; }
+	
+	print "</form>
+				</td>
+				<td align='right' valign='middle'>
+				<form name='formX'  method='GET' action='cetak/cetak_renbutgaji_satker.php' target='_blank'>
+				<input type='hidden' name='kdkotama' value='$_SESSION[kdkotama]' />
+				<input type='hidden' name='kdsatker' value='$_SESSION[kdsatker]' />
+				<input type='hidden' name='thang' value='$_GET[thang]' />
+				<div class='form-style-2'>LAMPIRAN : <input type='text'  name='lamp' class='input-field'  size='3' style='text-align: center;' />
+				&nbsp;&nbsp;<input  type='submit' value='Cetak' /> 
+				<a href='renbut/renbut_skr_spr.php?kdkotama=$_SESSION[kdkotama]&kdsatker=$_SESSION[kdsatker]&thang=$_GET[thang]'>&nbsp;&nbsp;<input  type='button' value='Export Excel' /></a></div></td>";
+				print "</tr></table></div>";
+
+	print "<table width='85%'  align='center' class='bordered'>";
+	print "<tr >";
+	print    "<th   align='center' rowspan='2' >NO</th>";
+	print    "<th   align='center' rowspan='2' width='30'>KODE<br>SATKER</th>";
+	print    "<th   align='center' rowspan='2' width='30'>AKUN</th>";
+	print    "<th   align='center' rowspan='2'>URAIAN</th>";
+	print    "<th   align='center' colspan='3'>RENCANA KEBUTUHAN TA $_GET[thang]</th>";
+	print    "<th   align='center' rowspan='2'>JUMLAH<br>(5+6+7)</th>";
+	print    "<th   align='center' rowspan='2'>KET</th>";
+	print    "<th   align='center' rowspan='2' colspan='2'>AKSI</th>";
+  	print "</tr>";
+	
+	
+	print "<tr >";
+	print    "<th   align='center' >JAN SD DES</th>";
+	print    "<th   align='center' >GAJI 13</th>";
+	print    "<th   align='center' >GAJI 14</th>";
+  	print "</tr>";
+	
+	
+	
+	print "<tr >";
+	print    "<td   align='center' bgcolor='e8e8e8'>1</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>2</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>3</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>4</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>5</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>6</td>";
+    print    "<td   align='center' bgcolor='e8e8e8'>7</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>8</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>9</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>10</td>";
+	print    "<td   align='center' bgcolor='e8e8e8'>11</td>";
+
+  	print "</tr>";
+	
+	$no=1;
+while($k = mysql_fetch_array($ok)){	
+
+	$jandes	 = number_format($k[jandes],0,',','.');
+	$g13  = number_format($k[gaji13],0,',','.');
+	$g14  = number_format($k[gaji14],0,',','.');
+	
+	
+	
+	
+	$jmlx = $k[jandes] + $k[gaji13] + $k[gaji14];
+	$jml  = number_format($jmlx,0,',','.');
+	
+	$jtotx += $jmlx;
+	$jtot  = number_format($jtotx,0,',','.');
+	
+	$jjandesx += $k[jandes];
+	$jjandes	 = number_format($jjandesx,0,',','.');
+	
+	$jg13x += $k[gaji13];
+	$jg13	 = number_format($jg13x,0,',','.');
+	
+	$jg14x += $k[gaji14];
+	$jg14	 = number_format($jg14x,0,',','.');
+	
+	
+	
+
+	print"<tr>";
+		print "<td  valign='top' align='right'>$no</td>
+			   <td  valign='top' align='center'>";
+			   if ($k[kdakun]=='511161') { 
+			   print $k[kdsatker]; } else { print ""; } print "</td>
+			   <td  valign='top' align='center'>$k[kdakun]</td>
+			   <td  valign='top' >$k[nmakun]</td>
+		       <td  valign='top' align='right'>$jandes</td>";
+		print "<td  valign='top' align='right'>$g13</td>";
+		print "<td  valign='top' align='right'>$g14</td>";
+		print "<td  valign='top' align='right'>$jml</td>";		
+		print "<td  valign='top' align='right'>$k[ket]</td>";		
+		print	"<td  valign='top' align='center'>";
+		if ($k[jandes]>0) {
+		print "<a href='media.php?module=editrenbut&aidi=$k[aidi]&thang=$k[thang]' data-tooltip='Edit Data' data-position='top' class='top'>
+		<img src='images/edit.png' width='20' ></a>";
+		} else {
+		print "<img src='images/edit1.png' width='20' >";
+		}
+		
+		print "</td>"; 
+		print"<td  valign='top' align='center'><a href=\"renbut/proses.php?aksi=hapus&aidi=$k[aidi]&thang=$k[thang]\" 
+					onClick=\"return confirm('APAKAH ANDA AKAN MENGHAPUS  ~ $k[nmakun] ~? ')\" data-tooltip='Hapus Data' data-position='top' class='top'>
+				<img src='images/delete.png' width='20'  ></a></td>"; 
+	$no++;	
+   }
+   
+ 
+		
+   print"<tr>";
+		print "<td  valign='top' align='right'></td>
+			  
+			   <td  valign='top' colspan='3'><b>Jumlah</b></td>
+		       <td  valign='top' align='right'><b>$jjandes</b></td>";
+		print "<td  valign='top' align='right'><b>$jg13</b></td>";
+		print "<td  valign='top' align='center'><b>$jg14</b></td>";
+		print "<td  valign='top' align='right'><b>$jtot</b></td>";	
+		print "<td  valign='top' align='right'></td>";		
+		print "<td  valign='top' align='right'></td>";	
+		print "<td  valign='top' align='right'></td>";	
+		print "</tr>";
+	print "</table><br>"; 
+
+?>
+

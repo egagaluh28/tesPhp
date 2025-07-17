@@ -1,0 +1,17 @@
+SELECT '' as pengembalian, '' as id_pagu,  a.kdwasgiat, a.kdkotama, a.kdsatker, a.thang, a.kdakun as kode, concat('1',a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun, a.kdsakun) as display, concat('>',' ', a.nmsakun) as uraian,  
+sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi,   '' as id_realisasi, c.blnlalu, d.blnini
+FROM dipa a 
+
+left join (select kdgiat, kdoutput, kdakun, kdsakun, kdkotama, kdsatker, thang, sum(realisasi) as blnlalu from realisasi where kdbulan<'09' and kdkotama='17' and kdsatker='344445' and thang='2020' and kdgiat='1466' group by kdgiat,kdoutput, kdakun,kdsakun) as c on  a.kdgiat=c.kdgiat and a.kdoutput=c.kdoutput and a.kdakun=c.kdakun and a.kdsakun=c.kdsakun 
+
+left join (select kdgiat, kdoutput, kdakun, kdsakun, kdkotama, kdsatker, thang, sum(realisasi) as blnini from realisasi where kdbulan='09' and kdkotama='17' and kdsatker='344445' and thang='2020' and kdgiat='1466' group by kdgiat,kdoutput, kdakun,kdsakun) as d on  a.kdgiat=d.kdgiat and a.kdoutput=d.kdoutput and a.kdakun=d.kdakun and a.kdsakun=d.kdsakun 
+
+where  a.kdkotama='17' and a.kdsatker='344445' and a.thang='2020' and a.kdgiat='1466'
+group by   a.kdprogram, a.kdgiat,a.kdoutput,a.kdakun,a.kdsakun
+
+
+
+
+select * from realisasi where kdkotama='17' and kdsatker='344445' and kdgiat='1466' and kdoutput='002' and kdakun='524111'
+
+select kdbulan, kdgiat, kdoutput, kdakun, kdsakun, kdkotama, kdsatker, thang, pagu from dipa where  kdkotama='17' and kdsatker='344445' and thang='2020' and kdgiat='1466' and kdakun='524111' group by kdgiat,kdoutput, kdakun,kdsakun

@@ -1,0 +1,76 @@
+SELECT a.kdakun, concat(a.kdakun,a.kdsakun) as display, a.nmsakun as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, '' as tglspm, sum(realisasi) as realisasi
+from dipa a 
+left join (select id_pagu, kdkotama, kdsatker, thang, sum(realisasi) as realisasi from  realisasi where kdkotama='05' and kdsatker='13' and thang='2017' group by id_pagu) as b on  a.id_pagu=b.id_pagu
+where a.kdprogram	='16' and
+	  a.kdgiat   	='1466' and
+	  a.kdoutput   	='002' and
+	  a.kdakun   	='521211' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' and
+	  a.thang    	='2017' 
+	  group by a.kdprogram, a.kdgiat, a.kdoutput,a.kdakun, a.kdsakun
+	  
+union (select a.kdakun, concat(a.kdakun,a.kdsakun,a.urutitem) as display, a.nmitem as uraian, a.pagu, a.revisi, a.pagurevisi, x.tglspm, x.realisasi from dipa a
+	  left join (select id_pagu, kdkotama, kdsatker, thang, '' as tglspm, sum(realisasi) as realisasi from   realisasi where kdkotama='05' and kdsatker='13' and thang='2017' group by id_pagu) as x on  a.id_pagu=x.id_pagu
+where a.kdprogram	='16' and
+	  a.kdgiat   	='1466' and
+	  a.kdoutput   	='002' and
+	  a.kdakun   	='521211' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' and
+	  a.thang    	='2017' 
+	  group by a.id_pagu) 	 
+	  
+	  
+union(select a.kdakun, concat(a.kdakun,a.kdsakun,a.urutitem,a.id_pagu) as display, '' as uraian, ''as pagu, '' as revisi, '' as pagurevisi, y.tglspm, y.realisasi from dipa a
+	  left join (select id_pagu, id_realisasi, kdkotama, kdsatker, thang, nospm as tglspm, realisasi from   realisasi where kdkotama='05' and kdsatker='13' and thang='2017' ) as y on  a.id_pagu=y.id_pagu
+where a.kdprogram	='16' and
+	  a.kdgiat   	='1466' and
+	  a.kdoutput   	='002' and
+	  a.kdakun   	='521211' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' and
+	  a.thang    	='2017' 
+	  group by y.id_realisasi)	  order by display 
+	  
+------------------------------------------------------------------------------------------------	  
+	  
+SELECT a.kdakun, a.kdsakun as display, a.nmsakun as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi, '' as nospm, '' as tglspm, sum(realisasi) as realisasi
+from dipa a 
+left join (select id_pagu, kdkotama, kdsatker, thang, sum(realisasi) as realisasi from  realisasi where kdkotama='05' and kdsatker='13' and thang='2017' group by id_pagu) as b on  a.id_pagu=b.id_pagu
+where a.kdsa	='1' and
+	  a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	='511211' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' and
+	  a.thang    	='2017' 
+	  group by a.kdprogram, a.kdgiat, a.kdoutput,a.kdakun, a.kdsakun 
+union (select a.kdakun, concat(a.kdsakun,a.urutitem,a.id_pagu) as display, a.nmitem as uraian, a.pagu, a.revisi, a.pagurevisi, '' as nospm, '' as tglspm, x.realisasi from dipa a
+	  left join (select id_pagu, kdkotama, kdsatker, thang,  sum(realisasi) as realisasi from   realisasi where kdkotama='05' and kdsatker='13' and thang='2017' group by id_pagu) as x on  a.id_pagu=x.id_pagu
+where a.kdsa	='1' and
+	  a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	='511211' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' and
+	  a.thang    	='2017' 
+	  group by a.id_pagu) 	 
+union(select a.kdakun, concat(a.kdsakun,a.urutitem,a.id_pagu,y.id_realisasi) as display, y.uraian, ''as pagu, '' as revisi, '' as pagurevisi, y.nospm, y.tglspm, y.realisasi from dipa a
+	  left join (select id_pagu, id_realisasi, kdkotama, kdsatker, thang, nospm, tglspm, uraian, realisasi from   realisasi where kdkotama='05' and kdsatker='13' and thang='2017' ) as y on  a.id_pagu=y.id_pagu
+where a.kdsa	='1' and
+	  a.kdprogram	='24' and
+	  a.kdgiat   	='1474' and
+	  a.kdoutput   	='994' and
+	  a.kdakun   	='511211' and
+	  a.kdkotama 	='05' and 
+	  a.kdsatker 	='13' and
+	  a.thang    	='2017' 
+	  group by y.id_realisasi)	  order by display 
+	  
+	  
+thang=2017&kdsa=1&kdkotama=05&kdsatker=13&kdprogram=24&kdgiat=1474&kdoutput=994&kdakun=511211	  
+	  
+	 

@@ -1,0 +1,10 @@
+SELECT a.thang, a.kdkotama, a.kdsatker, b.nmkotama, c.nmsatkr, a.kdakun, a.nmakun, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi,  d.jan, e.feb
+FROM dipa a 
+left join t_kotam b on a.kdkotama=b.kdkotama
+left join t_satkr c on a.kdkotama=c.kdkotama and a.kdsatker=c.kdsatkr
+left join (select  a.kdakun, a.kdkotama, a.kdsatker, a.thang, sum(b.realisasi) as jan from dipa a left join realisasi b on a.id_pagu=b.id_pagu where b.kdbulan='01'  and a.thang='2019' and substr(a.kdakun,1,3)='511' group by a.kdkotama, a.kdsatker, a.kdakun) as d on a.kdakun=d.kdakun and a.kdkotama=d.kdkotama and a.kdsatker=d.kdsatker
+
+left join (select  a.kdakun, a.kdkotama, a.kdsatker, a.thang, sum(b.realisasi) as feb from dipa a left join realisasi b on a.id_pagu=b.id_pagu where b.kdbulan='02'  and a.thang='2019' and substr(a.kdakun,1,3)='511' group by a.kdkotama, a.kdsatker, a.kdakun) as e on a.kdakun=e.kdakun and a.kdkotama=e.kdkotama and a.kdsatker=e.kdsatker
+
+where  a.thang='2019' and substr(a.kdakun,1,3)='511'
+group by   a.kdkotama, a.kdsatker, a.kdakun order by a.kdkotama, a.kdsatker, a.kdakun

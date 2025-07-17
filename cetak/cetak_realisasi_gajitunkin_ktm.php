@@ -1,0 +1,427 @@
+<?php 
+
+include "../application/connect.php";
+include "../library/indotgl_angka.php";
+include "../library/indotgl.php";
+define('FPDF_FONTPATH','../fpdf17/font/');
+require('../fpdf17/fpdf.php');
+
+// new
+// ukuran a4 = 210 x 297 mm
+$pdf=new FPDF('P','mm','A4');
+$pdf->Open(); 
+$pdf->SetAutoPageBreak(false);
+$pdf->SetFont('Arial','',11);
+$pdf->AddPage();
+// KOP
+
+$kop= mysql_query("select * from kopstuk where kdkotama='$_GET[kdkotama]' and kdsatker='$_GET[kdsatker]'"); 
+$x = mysql_fetch_array($kop);
+
+$lamp= mysql_query("select * from lamp_laplakgar where kdkotama='$_GET[kdkotama]' and kdsatker='$_GET[kdsatker]' and kdbulan='$_GET[kdbulan]' and thang='$_GET[thang]'"); 
+$z = mysql_fetch_array($lamp);
+	
+$kop=$x[panjang_kop];
+$grs=$x[panjang_grs];
+
+$garis=$z[panjang_grs];
+$posisi=$z[posisi_grs];
+
+$pdf->Sety(18); 
+$pdf->SetX(15); 
+$pdf->Cell($kop+15,5,$x[kop1],0,1,'C');
+$pdf->SetX(15); 
+$pdf->Cell($kop+15,5,$x[kop2],0,1,'C');
+$pdf->SetX(15); 
+$pdf->Cell($grs+15,0,'                             ',0,0,'C',1); 
+
+
+
+$pdf->SetFillColor(255,255,255);
+$pdf->Sety(18); 
+$pdf->SetX(160); 
+$pdf->Cell(40,5,$z[brs1],0,0,'R',1);
+
+$pdf->Sety(23); 
+$pdf->SetX(160); 
+$pdf->Cell(40,5,$z[brs2],0,0,'R',1);
+$pdf->Sety(28); 
+$pdf->SetX(160); 
+$pdf->Cell(40,5,$z[brs3],0,0,'R',1);
+$pdf->Sety(33); 
+
+
+
+
+
+$pdf->SetFont('Arial','',11);
+$pdf->Sety(18); 
+$pdf->SetX($posisi-90); 
+$pdf->Cell(10,5,'Lampiran'.' '.$_GET['lamp'],0,0,'L',1);
+$pdf->Sety(23); 
+$pdf->SetX($posisi-90); 
+$pdf->Cell(10,5,'Nomor ',0,0,'L',1);
+$pdf->Sety(28); 
+$pdf->SetX($posisi-90); 
+$pdf->Cell(10,5,'Tanggal',0,0,'L',1);
+
+$pdf->Sety(33); 
+$pdf->SetX($posisi-89);
+$pdf->Cell($garis+5,0,'                             ','T',0,'C',1);
+   
+	 $sql= mysql_query("SELECT a.kdsatker as display, b.nmsatkr as uraian, a.thang, a.kdkotama, a.kdsatker, sum(a.pagurevisi) as pagurevisi, c.penarikan
+FROM dipa a 
+left join t_satkr b on a.kdkotama=b.kdkotama and a.kdsatker=b.kdsatkr
+left join (select  kdkotama, kdsatker, thang, sum(realisasi) as penarikan from  realisasi  where kdbulan<='$_GET[kdbulan]' and kdkotama='$_GET[kdkotama]'  and thang='$_GET[thang]' and kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', '511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222','511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235', '511238', '511239', '511241', '511242', '511243', '511244', '511245') group by kdkotama, kdsatker, thang) as c on  a.kdkotama=c.kdkotama and a.kdsatker=c.kdsatker and a.thang=c.thang 
+where  a.kdkotama='$_GET[kdkotama]'  and a.thang='$_GET[thang]' and a.kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', 
+'511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222','511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235', '511238', '511239', '511241', '511242', '511243', '511244', '511245', '512411') group by a.kdkotama, a.kdsatker, a.thang
+union
+SELECT concat(a.kdsatker,'1') as display, 'Gaji dan Tunjangan' as uraian, a.thang, a.kdkotama, a.kdsatker, sum(a.pagurevisi) as pagurevisi, c.penarikan
+FROM dipa a 
+left join (select  kdkotama, kdsatker, thang, sum(realisasi) as penarikan from  realisasi  where kdbulan<='$_GET[kdbulan]' and kdkotama='$_GET[kdkotama]'  and thang='$_GET[thang]' and kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', '511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222','511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235', '511238', '511239', '511241', '511242', '511243', '511244', '511245') group by kdkotama, kdsatker, thang) as c on  a.kdkotama=c.kdkotama and a.kdsatker=c.kdsatker and a.thang=c.thang 
+where  a.kdkotama='$_GET[kdkotama]'  and a.thang='$_GET[thang]' and a.kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', 
+'511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222','511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235', '511238', '511239', '511241', '511242', '511243', '511244', '511245') group by a.kdkotama, a.kdsatker, a.thang
+union
+SELECT concat(a.kdsatker,'2') as display, 'Tunjangan Kinerja' as uraian, a.thang, a.kdkotama, a.kdsatker, sum(a.pagurevisi) as pagurevisi, c.penarikan
+FROM dipa a 
+left join (select  kdkotama, kdsatker, thang, sum(realisasi) as penarikan from  realisasi  where kdbulan<='$_GET[kdbulan]' and kdkotama='$_GET[kdkotama]' and thang='$_GET[thang]' and kdakun='512411' group by kdkotama, kdsatker, thang) as c on  a.kdkotama=c.kdkotama and a.kdsatker=c.kdsatker and a.thang=c.thang 
+where  a.kdkotama='$_GET[kdkotama]'  and a.thang='$_GET[thang]' and a.kdakun='512411' group by a.kdkotama, a.kdsatker, a.thang
+
+order by display"); 
+	
+switch ($_GET[kdbulan]) {
+case "01" : $bulan="31 JANUARI";break;
+case "02" : $bulan="28 FEBRUARI";break;
+case "03" : $bulan="31 MARET";break;
+case "04" : $bulan="30 APRIL";break;
+case "05" : $bulan="31 MEI";break;
+case "06" : $bulan="30 JUNI";break;
+case "07" : $bulan="31 JULI";break;
+case "08" : $bulan="31 AGUSTUS";break;
+case "09" : $bulan="30 SEPTEMBER"; break;
+case "10" : $bulan="31 OKTOBER";break;
+case "11" : $bulan="30 NOVEMBER";break;
+case "12" : $bulan="31 DESEMBER";break;
+}
+
+
+$indbul=$bulan.' '.$_GET[thang];
+$sasi = substr($bulan,3,30);
+
+
+	
+$pdf->Ln(10); 
+// header
+$pdf->SetY(37);
+$pdf->SetFont('Arial','',11);
+$pdf->Cell(0,5,'REALISASI GAJI DAN TUNJANGAN SERTA TUNJANGAN KINERJA',0,1,'C'); 
+
+$pdf->SetY(42); 
+$pdf->SetX(8); 
+$pdf->Cell(0,5,'S.D '. $indbul,0,1,'C');
+
+
+$pdf->SetFillColor(255,255,255);
+$pdf->SetFont('Arial','',10);
+$pdf->SetY(55); 
+$pdf->SetX(15); 
+$pdf->Cell(10,12,'NO',1,0,'C',1); 
+
+$pdf->SetY(55); 
+$pdf->SetX(25);
+$pdf->Cell(56,12,'URAIAN',1,0,'C',1); 
+
+$pdf->SetY(55); 
+$pdf->SetX(81);
+$pdf->Cell(35,6,'DIPA TA','LRT',0,'C',0); 
+$pdf->SetY(61); 
+$pdf->SetX(81);
+$pdf->Cell(35,6,'SETELAH REVISI','LRB',0,'C',0); 
+
+$pdf->SetY(55); 
+$pdf->SetX(116);
+$pdf->Cell(35,6,'REALISASI S.D','LRT',0,'C',0); 
+$pdf->SetY(61); 
+$pdf->SetX(116);
+$pdf->Cell(35,6,$bulan.' '.$_GET[thang],'LRB',0,'C',0); 
+
+$pdf->SetY(55); 
+$pdf->SetX(151);
+$pdf->Cell(35,6,'SISA','LRT',0,'C',0); 
+$pdf->SetY(61); 
+$pdf->SetX(151);
+$pdf->Cell(35,6,'(3-4)','LRB',0,'C',0); 
+
+$pdf->SetY(55); 
+$pdf->SetX(186);
+$pdf->Cell(15,12,'KET',1,0,'C',0); 
+
+$pdf->Ln(12);
+$pdf->SetX(15); 
+$pdf->Cell(10,6,'1',1,0,'C',0); 
+$pdf->Cell(56,6,'2',1,0,'C',0); 
+$pdf->Cell(35,6,'3',1,0,'C',0);
+$pdf->Cell(35,6,'4',1,0,'C',0); 
+$pdf->Cell(35,6,'5',1,0,'C',0);
+$pdf->Cell(15,6,'6',1,0,'C',0);
+
+$pdf->Ln(6.2);
+
+$hal=1;
+
+$i = 0; 
+
+$no=1;
+$tempNo = null;
+$abjad='a';
+$tempAbjad = null;
+$romawi=1;
+$tempRomawi = null;
+
+while($row = mysql_fetch_array($sql)) {
+	
+	if (($hal) == '1') {   
+     $max=32;
+   } else {	 $max=37; }
+
+if ($max==$i) 
+  {
+  $hal++;
+   // Print header table show every page
+   $pdf->AddPage();
+   $pdf->SetFillColor(255,255,255);
+   $ng = $pdf->GetY(); 
+   $pdf->SetX(13); 
+   $pdf->SetFont('Arial','',10);
+   $pdf->Cell(0,5,$hal,0,1,'C');
+   
+   
+   $pdf->SetFillColor(255,255,255);
+$pdf->SetFont('Arial','',10);
+
+$pdf->SetY(18); 
+$pdf->SetX(15); 
+$pdf->Cell(10,12,'NO',1,0,'C',1); 
+
+$pdf->SetY(18); 
+$pdf->SetX(25);
+$pdf->Cell(56,12,'URAIAN',1,0,'C',1); 
+
+$pdf->SetY(18); 
+$pdf->SetX(81);
+$pdf->Cell(35,6,'DIPA TA','LRT',0,'C',0); 
+$pdf->SetY(24); 
+$pdf->SetX(81);
+$pdf->Cell(35,6,'SETELAH REVISI','LRB',0,'C',0); 
+
+$pdf->SetY(18); 
+$pdf->SetX(116);
+$pdf->Cell(35,6,'REALISASI S.D','LRT',0,'C',0); 
+$pdf->SetY(24); 
+$pdf->SetX(116);
+$pdf->Cell(35,6,$bulan.' '.$_GET[thang],'LRB',0,'C',0); 
+
+$pdf->SetY(18); 
+$pdf->SetX(151);
+$pdf->Cell(35,6,'SISA','LRT',0,'C',0); 
+$pdf->SetY(24); 
+$pdf->SetX(151);
+$pdf->Cell(35,6,'(3-4)','LRB',0,'C',0); 
+
+$pdf->SetY(18); 
+$pdf->SetX(186);
+$pdf->Cell(15,12,'KET',1,0,'C',0); 
+
+
+
+$pdf->Ln();
+$pdf->SetX(15); 
+$pdf->Cell(10,6,'1',1,0,'C',0); 
+$pdf->Cell(56,6,'2',1,0,'C',0); 
+$pdf->Cell(35,6,'3',1,0,'C',0);
+$pdf->Cell(35,6,'4',1,0,'C',0); 
+$pdf->Cell(35,6,'5',1,0,'C',0);
+$pdf->Cell(15,6,'6',1,0,'C',0);
+
+    $i=0;
+   $pdf->Ln(6.2); 
+  }
+
+
+	$hasil	 = number_format($row[pagurevisi],0,',','.');
+	$hasil1  = number_format($row[penarikan],0,',','.');
+	
+	$turahan = $row[pagurevisi] - $row[penarikan];
+	$sisa  = number_format($turahan,0,',','.');
+	$str = $row['display'];
+    $pj = strlen($str);
+	
+// memberikan nomor urut berupa romawi, norut dan abjad	
+		// memberikan nomor urut berupa romawi, norut dan abjad	
+		$pdf->SetX(15);
+		$ng = $pdf->GetY(); 
+	if ($pj=='6') {	
+	    $pdf->SetFont('Arial','B',11);
+		$pdf->Cell(10,6,$romawi.''.'.','LR',1,'C',2);
+      
+		$tempRomawi = $romawi;
+        $romawi++;		
+		
+	} else if ($pj=='7') {	
+		if($tempRomawi != $romawi)
+		{
+			$abjad='a';
+			$tempRomawi = $romawi;
+		}else{
+		
+		}	
+		$pdf->SetFont('Arial','',11);
+		$pdf->Cell(10,6,$abjad.''.'.','LR',1,'R',1);
+		
+		$tempAbjad = $abjad;
+        $abjad++;		
+ 	
+	} else {
+	$pdf->Cell(10,6,'','LR',1,'C',2);
+	}
+
+		
+	if ($pj=='6') {	
+		$pdf->SetFont('Arial','B',10);
+		$pdf->SetY($ng);
+		$pdf->SetX(25);
+		$pdf->Cell(56,6,$row[uraian],'LR',1,'L',2);
+		$pdf->SetY($ng);
+		$pdf->SetX(81);
+		$pdf->Cell(35,6,$hasil,'LR',1,'R',2);
+		$pdf->SetY($ng);
+		$pdf->SetX(116);
+		$pdf->Cell(35,6,$hasil1,'LR',1,'R',2); 
+		$pdf->SetY($ng);
+		$pdf->SetX(151);	
+		$pdf->Cell(35,6,$sisa,'LR',1,'R',2); 
+		$pdf->SetY($ng);
+		$pdf->SetX(186);
+		$pdf->Cell(15,6,'','LR',1,'R',2); 
+	} else {
+		$pdf->SetFont('Arial','',10);	
+		$pdf->SetY($ng);
+		$pdf->SetX(25);
+		$pdf->Cell(56,6,$row[uraian],'LR',1,'L',2);
+		$pdf->SetY($ng);
+		$pdf->SetX(81);
+		$pdf->Cell(35,6,$hasil,'LR',1,'R',2);
+		$pdf->SetY($ng);
+		$pdf->SetX(116);
+		$pdf->Cell(35,6,$hasil1,'LR',1,'R',2); 
+		$pdf->SetY($ng);
+		$pdf->SetX(151);	
+		$pdf->Cell(35,6,$sisa,'LR',1,'R',2); 
+		$pdf->SetY($ng);
+		$pdf->SetX(186);
+		$pdf->Cell(15,6,'','LR',1,'R',2); 
+	}		
+	
+	$i++;
+	$no++;
+		
+	}
+
+$jml=mysql_query("select z.kdkotama, z.thang, sum(z.pagurevisi) as pagurevisi , sum(z.penarikan) as penarikan from(SELECT a.thang, a.kdkotama,  a.kdakun, a.nmakun, sum(a.pagurevisi) as pagurevisi, c.penarikan
+FROM dipa a 
+left join (select kdgiat, kdoutput, kdakun, kdkotama,  thang, sum(realisasi) as penarikan from  realisasi  where kdbulan<='$_GET[kdbulan]' and kdkotama='$_GET[kdkotama]'  and thang='$_GET[thang]' and kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', 
+'511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222',
+'511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235',
+'511236', '511237', '511238', '511239', '511241', '511242', '511243', '511244', '511245','512211','512411') group by kdakun) as c on  a.kdgiat=c.kdgiat and a.kdoutput=c.kdoutput and a.kdakun=c.kdakun 
+where  a.kdkotama='$_GET[kdkotama]'  and a.thang='$_GET[thang]' and a.kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', 
+'511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222',
+'511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235',
+'511236', '511237', '511238', '511239', '511241', '511242', '511243', '511244', '511245','512211','512411') group by a.kdakun) as z where z.kdkotama='$_GET[kdkotama]' and z.thang='$_GET[thang]'"); 
+$x = mysql_fetch_array($jml);	
+
+		$hasilx	 = number_format($x[pagurevisi],0,',','.');
+	    $hasil1x  = number_format($x[penarikan],0,',','.');
+	
+	    $turahanx = $x[pagurevisi] - $x[penarikan];
+	    $sisax  = number_format($turahanx,0,',','.');
+
+	$ng = $pdf->GetY(); 
+    $pdf->SetX(15); 
+	$pdf->SetFont('Arial','B',10);
+    $pdf->Cell(10,6,'',1,0,'C',1); 
+	$pdf->Cell(56,6,'J U M L A H',1,0,'L',1); 
+	$pdf->Cell(35,6,$hasilx,1,0,'R',1);
+	$pdf->Cell(35,6,$hasil1x,1,0,'R',1);
+	//$pdf->Cell(18,6,$prosen_desx,1,0,'C',1);
+	$pdf->Cell(35,6,$sisax,1,0,'R',1);
+	$pdf->Cell(15,6,'',1,0,'C',1);
+
+$pdf->Ln(6.2);
+
+//-----------------------------------jml bawah------------------------
+
+$jml="SELECT concat(a.kdkotama,'1') as display, 'Gaji dan Tunjangan' as uraian, a.thang, a.kdkotama, sum(a.pagurevisi) as pagurevisi, c.penarikan
+FROM dipa a 
+left join (select  kdkotama,  thang, sum(realisasi) as penarikan from  realisasi  where kdbulan<='$_GET[kdbulan]' and kdkotama='$_GET[kdkotama]'  and thang='$_GET[thang]' and kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', '511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222','511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235', '511238', '511239', '511241', '511242', '511243', '511244', '511245') group by kdkotama, thang) as c on  a.kdkotama=c.kdkotama and  a.thang=c.thang 
+where  a.kdkotama='$_GET[kdkotama]'  and a.thang='$_GET[thang]' and a.kdakun in ('511161', '511169', '511171', '511172', '511173', '511174', '511175', '511176', '511179', '511185', 
+'511189', '511191', '511192', '511193', '511194', '511195', '511211', '511219', '511221', '511222','511223', '511224', '511225', '511226', '511227', '511228', '511232', '511233', '511234', '511235', '511238', '511239', '511241', '511242', '511243', '511244', '511245') group by a.kdkotama,  a.thang
+union
+SELECT concat(a.kdkotama,'2') as display, 'Tunjangan Kinerja' as uraian, a.thang, a.kdkotama,  sum(a.pagurevisi) as pagurevisi, c.penarikan
+FROM dipa a 
+left join (select  kdkotama,  thang, sum(realisasi) as penarikan from  realisasi  where kdbulan<='$_GET[kdbulan]' and kdkotama='$_GET[kdkotama]' and thang='$_GET[thang]' and kdakun='512411' group by kdkotama,  thang) as c on  a.kdkotama=c.kdkotama and  a.thang=c.thang 
+where  a.kdkotama='$_GET[kdkotama]'  and a.thang='$_GET[thang]' and a.kdakun='512411' group by a.kdkotama,  a.thang order by display";
+
+		$hasil = mysql_query($jml);
+
+ $noo='a';
+ while($data = mysql_fetch_array($hasil)){  
+ 
+	$stlhrevisi1	 = $data[pagurevisi];
+	$hasil1	 = number_format($stlhrevisi1,0,',','.');
+	$penarikan1	 = number_format($data[penarikan],0,',','.');
+	$turah1 = $data[pagurevisi] - $data[penarikan];
+	$sisa1	 = number_format($turah1,0,',','.');
+	
+	
+	$ng = $pdf->GetY(); 
+    $pdf->SetX(15); 
+	$pdf->SetFont('Arial','',10);
+    $pdf->Cell(10,6,$noo.'.',1,0,'R',1); 
+	$pdf->Cell(56,6,$data[uraian],1,0,'L',1); 
+	$pdf->Cell(35,6,$hasil1,1,0,'R',1);
+	$pdf->Cell(35,6,$penarikan1,1,0,'R',1);
+	//$pdf->Cell(18,6,$prosen_desx,1,0,'C',1);
+	$pdf->Cell(35,6,$sisa1,1,0,'R',1);
+	$pdf->Cell(15,6,'',1,0,'C',1);
+	$noo++;
+	$pdf->Ln();
+ }
+//------------------------------------------------------------------------	
+	
+$sql=mysql_query("SELECT * FROM tajuk_ttd where kdkotama='$_GET[kdkotama]' and kdsatker='$_GET[kdsatker]' and kdbulan='$_GET[kdbulan]' and thang='$_GET[thang]'"); ;
+$row = mysql_fetch_array($sql);
+
+
+//$pdf->Ln();
+$pdf->SetFont('Arial','',11);
+//$ng = $pdf->GetY();
+//$pdf->SetY($ng);
+//$pdf->SetX(170); 
+//$pdf->Cell(0,6,$row['tempat'].",          ".$row['tanggal'],0,1,'C');
+
+$pdf->SetY($ng);
+$pdf->SetX(110); 
+$pdf->Cell(0,20,$row['an'],0,1,'C');
+$pdf->SetY($ng);
+$pdf->SetX(110); 
+$pdf->Cell(0,30,$row['pejabat1'],0,1,'C');
+$pdf->SetY($ng);
+$pdf->SetX(110); 
+$pdf->Cell(0,60,$row['nama'],0,1,'C');
+$pdf->SetY($ng);
+$pdf->SetX(110); 
+$pdf->Cell(0,70,$row['pkt_crp'],0,1,'C');
+
+$pdf->Output();
+
+?> 
