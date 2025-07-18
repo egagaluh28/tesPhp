@@ -1,12 +1,14 @@
 <?php
-session_start();
+// PERBAIKAN: Cek apakah sesi sudah dimulai sebelum memanggil session_start()
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-$module=$_GET[module];
+// PERBAIKAN: Gunakan tanda kutip untuk kunci array string
+$module=$_GET['module'];
 
 switch ($module) {
 case "dashboard"   				: include "dashboard/depan_satker_v2.php";break;
-//case "dashboard"   				: include "dashboard/depan_satker.php";break;
-//case "dashboard_ktm"   			: include "dashboard/depan_ktm_v1.php";break;
 case "dashboard_ktm"   			: include "dashboard/depan_ktm_v2.php";break;
 case "dashboard_uo"   			: include "dashboard/depan_uo_v2.php";break;
 
@@ -139,7 +141,7 @@ case "pagukotamahibah"	 		: include "hibah/pagukotama.php";break;
 case "realisasi_ktm_hibah"	 	: include "realisasihibah/realisasi_ktm.php";break;
 
 case "paguuohibah"	 			: include "hibah/paguuo.php";break;
-case "realisasi_uo_hibah"	 	: include "realisasihibah/realisasi_uo.php";break;
+case "realisasi_uo_hibah"	 	: include "hibah/realisasi_uo.php";break;
 
 //-----------------------------
 //kapitasi
@@ -199,8 +201,6 @@ case "rapikanttd"	 			: include "pengelola/ttd/rapikanttd.php";break;
 case "lampiran"	 				: include "pengelola/lampiran/lampiran.php";break;
 case "inputlampiran"	 		: include "pengelola/lampiran/input.php";break;
 case "editlampiran"	 			: include "pengelola/lampiran/edit.php";break;
-
-
 
 
 
@@ -290,7 +290,6 @@ case "formc_daerah_ktm_wasgiat_u_uo"		: include "form_uo/formc_daerah_kotama_was
 
 
 
-
 //case "formc_pusat_satker"			: include "form/formc_pusat_satker.php";break;
 case "formc_mon_pusat_satker"		: include "form/formc_mon_pusat_satker.php";break;
 case "formc_pusat_satker_jenbel"	: include "form/formc_pusat_satker_jenbel.php";break;
@@ -318,7 +317,7 @@ case "formc_daerah_ktm_jenbel"					: include "form_ktm/formc_daerah_ktm_jenbel.p
 
 case "form_bpjs_ktm"							: include "form_ktm/form_bpjs_ktm.php";break;
 case "formc_bpjs_ktm"							: include "form_ktm/formc_bpjs_ktm.php";break;
-case "formc_bpjs_satker_u_ktm"					: include "form_ktm/formc_bpjs_satker_u_ktm.php";break;	
+case "formc_bpjs_satker_u_ktm"					: include "form_ktm/formc_bpjs_satker_u_ktm.php";break;
 
 case "form_yanmasum_ktm"						: include "form_ktm/form_yanmasum_ktm.php";break;
 case "formc_yanmasum_ktm"						: include "form_ktm/formc_yanmasum_ktm.php";break;
@@ -335,7 +334,7 @@ case "formc_kapitasi_satker_u_ktm"				: include "form_ktm/formc_kapitasi_satker_
 
 case "form_sbsn_ktm"							: include "form_ktm/form_sbsn_ktm.php";break;
 case "formc_sbsn_ktm"							: include "form_ktm/formc_sbsn_ktm.php";break;
-case "formc_sbsn_satker_u_ktm"					: include "form_ktm/formc_sbsn_satker_u_ktm.php";break;	
+case "formc_sbsn_satker_u_ktm"					: include "form_ktm/formc_sbsn_satker_u_ktm.php";break;
 
 case "form_hibah_ktm"							: include "form_ktm/form_hibah_ktm.php";break;
 case "formc_hibah_ktm"							: include "form_ktm/formc_hibah_ktm.php";break;
@@ -406,13 +405,15 @@ case "formc_sbsn_uo"							: include "form_uo/formc_sbsn_uo.php";break;
 
 
 
-
-
 case "formc_mon_daerah_satker_wasgiat"  : include "form/formc_mon_daerah_satker_wasgiat.php";break;
 
 
 
 case "formc_daerah_satker_jenbel"	: include "form/formc_daerah_satker_jenbel.php";break;
+
+
+
+
 
 
 
@@ -438,8 +439,6 @@ case "formc_mon_pusat_satker_wasgiat_u_ktm"	: include "form/formc_mon_pusat_satk
 
 
 //--------------cetakan kotama peruntukan uo-------------------------
-
-
 
 
 
@@ -696,4 +695,4 @@ case "rincian_akun_satker"		: include "fixed/setahu_akun.php";break;
 }
 
 
-?>	
+?>

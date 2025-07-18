@@ -11,7 +11,7 @@ include "../../application/connect.php";
 	$saiki= date("ymdhis");
 	$aidi = $saiki.''.$_POST['kdkotama'];
 
-		$data="select count(usernamelaplakgar) as jml from userlaplakgar where usernamelaplakgar='$_POST[usernamelaplakgar]'";
+		$data="select count(usernamelaplakgar) as jml from user where usernamelaplakgar='$_POST[usernamelaplakgar]'";
 		$hasil=mysql_query($data);
 		$row = mysql_fetch_array($hasil);
 
@@ -25,7 +25,7 @@ if ($_GET[aksi]=='simpan'){
 		} else {
 		
 		$pass=md5($_POST[passwordlaplakgar]);
-        mysql_query("INSERT INTO userlaplakgar(aidi_aidi_aidi, usernamelaplakgar,
+        mysql_query("INSERT INTO user(aidi_aidi_aidi, usernamelaplakgar,
                                 passwordlaplakgar,
                                 kdkotama, 
 								kdsatker,
@@ -52,7 +52,7 @@ if ($_GET[aksi]=='simpan'){
 	
 } else if ($_GET[aksi]=='hapus') {
   
-		mysql_query("DELETE FROM userlaplakgar WHERE aidi_aidi_aidi='$_GET[aidi_aidi_aidi]'");;
+		mysql_query("DELETE FROM user WHERE aidi_aidi_aidi='$_GET[aidi_aidi_aidi]'");;
 		
 	?><script language="JavaScript">;
     document.location='<? print "../.././media.php?module=user"; ?>'</script><?
@@ -61,7 +61,7 @@ if ($_GET[aksi]=='simpan'){
 		
 		 // Apabila password tidak diubah
 		    if (empty($_POST[passwordlaplakgar])) {
-			mysql_query("UPDATE userlaplakgar SET usernamelaplakgar      = '$_POST[usernamelaplakgar]',
+			mysql_query("UPDATE user SET usernamelaplakgar      = '$_POST[usernamelaplakgar]',
 												  kdkotama		= '$_POST[kdkotama]',
 												  kdsatker		= '$_POST[kdsatker]',
 												  nama_lengkap  = '$_POST[nama_lengkap]',
@@ -75,7 +75,7 @@ if ($_GET[aksi]=='simpan'){
 		  // Apabila password diubah
 		    } else {
 			$pass=md5($_POST[passwordlaplakgar]);
-			mysql_query("UPDATE userlaplakgar SET usernamelaplakgar = '$_POST[usernamelaplakgar]',
+			mysql_query("UPDATE user SET usernamelaplakgar = '$_POST[usernamelaplakgar]',
 												  passwordlaplakgar = '$pass',
 												  kdkotama			= '$_POST[kdkotama]',
 												  kdsatker			= '$_POST[kdsatker]',
@@ -94,7 +94,7 @@ if ($_GET[aksi]=='simpan'){
 	} else if ($_GET[aksi]=='gantiuser') {
 		
 		   if (empty($_POST[passwordlaplakgar])) {
-		   mysql_query("UPDATE userlaplakgar SET 
+		   mysql_query("UPDATE user SET 
 												  nama_lengkap  = '$_POST[nama_lengkap]',
 												  telp			= '$_POST[telp]',
 												  tanggal       = '$tgl_sekarang',
@@ -102,7 +102,7 @@ if ($_GET[aksi]=='simpan'){
 								    WHERE aidi_aidi_aidi            = '$_POST[id]'");	 
 			} else {
 			$pass=md5($_POST[passwordlaplakgar]);					   
-			mysql_query("UPDATE userlaplakgar SET 
+			mysql_query("UPDATE user SET 
 												  passwordlaplakgar = '$pass',
 												  nama_lengkap  = '$_POST[nama_lengkap]',
 												  telp			= '$_POST[telp]',

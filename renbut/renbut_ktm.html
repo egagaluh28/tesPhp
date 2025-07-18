@@ -1,12 +1,11 @@
-
-
 <html>
+
 <head>
 
-<link rel="stylesheet" href="library/style_table.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="library/style_table.css" type="text/css" media="screen" />
 
 
-<?php  error_reporting(0);
+	<?php  error_reporting(0);
 		 $satkr = mysql_query("select * from t_satkr   where kdkotama='$_GET[kdkotama]' and kdsatkr='$_GET[kdsatker]'");
 		 $y   = mysql_fetch_array($satkr);
 		
@@ -162,4 +161,3 @@ while($k = mysql_fetch_array($ok)){
 	print "</table><br>"; 
 
 ?>
-

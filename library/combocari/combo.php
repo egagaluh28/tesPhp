@@ -20,7 +20,7 @@ include "../../application/connect.php";
 <?php  $jssArray = "var isi5 = new Array();\n"; ?>
  <select id="provinsi" name="nip" class="sendiri" onchange='changeValue5(this.value)'>
  <option></option>
-   <?php 	 $sql=mysqli_query($connect, "select * from hrm_t_gaji_rek order by kd_jab, kd_dep, norut");
+   <?php 	 $sql=mysql_query($connect, "select * from hrm_t_gaji_rek order by kd_jab, kd_dep, norut");
 			    while ($data=mysqli_fetch_array($sql)){
 					$tunjab	 = number_format($data[tunjab],0,',','.');
 					$gapok	 = number_format($data[gapok],0,',','.');

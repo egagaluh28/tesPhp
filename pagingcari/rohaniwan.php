@@ -10,7 +10,7 @@
 //        includekan fungsi paginasi
         include 'pagingcari/pagination1.php';
 //        koneksi ke database
-  //  $login = mysqli_query($connect, "SELECT * FROM userppp WHERE usernameppp = '$username' AND passwordppp='$pass'");
+  //  $login = mysql_query($connect, "SELECT * FROM userppp WHERE usernameppp = '$username' AND passwordppp='$pass'");
         
 //        mengatur variabel reload dan sql
         if(isset($_REQUEST['keyword']) && $_REQUEST['keyword']<>""){
@@ -18,11 +18,11 @@
 //        pakai ini
             $keyword=$_REQUEST['keyword'];
             $reload = "media.php?module=rohaniwan&pagination=true&keyword=$keyword";
-            $result =  mysqli_query($connect, "SELECT * FROM dai WHERE nama LIKE '%$keyword%' ORDER BY nama");
+            $result =  mysql_query($connect, "SELECT * FROM dai WHERE nama LIKE '%$keyword%' ORDER BY nama");
         }else{
 //            jika tidak ada pencarian pakai ini
             $reload = "media.php?module=rohaniwan&pagination=true";
-                       $result =  mysqli_query($connect, "SELECT * FROM dai ORDER BY nama");
+                       $result =  mysql_query($connect, "SELECT * FROM dai ORDER BY nama");
         }
         
         //pagination config start

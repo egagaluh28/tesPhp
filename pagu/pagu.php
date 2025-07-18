@@ -1,175 +1,323 @@
+<html>
+    <head>
+        <title>DAI</title>
+        <link rel="stylesheet" href="library/style_table.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="library/style_pencarian1.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="library/style_paging.css" type="text/css" media="screen" />
+    </head>
+    <body>
 
-<?
-   
-print "<br><table  width='1100' align='center' ><tr><td class='judulsubcontent' align='center'>PEREKAMAN DATA DIPA PETIKAN SATKER TA $_GET[thang]</td></tr></table>";	
+    <br><center><span class='judulcontent'>DATA USER</span></center><br>
 
-$query= "SELECT '' as id_pagu,  '' as kdprogram, kdwasgiat, '' as nmwasgiat, kdkotama, kdsatker, thang, '' as kode, '1' as display,  'RUPIAH MURNI' as uraian, sum(pagu) as pagu, sum(revisi) as revisi, sum(pagurevisi) as pagurevisi
-FROM dipa where  kdkotama='$_SESSION[kdkotama]' and kdsatker='$_SESSION[kdsatker]' and thang='$_GET[thang]' 
-group by kdkotama, kdsatker, thang
+        <?php
+        // Mulai sesi jika belum dimulai
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
 
-union (SELECT '' as id_pagu, '' as kdprogram, a.kdwasgiat, '' as nmwasgiat, a.kdkotama, a.kdsatker,  a.thang, concat('012.','22.',a.kdprogram) as kode, concat('1',a.kdprogram) as display, b.nmprogram as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi 
-FROM dipa a 
-left join t_program b on a.kdprogram=b.kdprogram
-where  a.kdkotama='$_SESSION[kdkotama]' and a.kdsatker='$_SESSION[kdsatker]' and a.thang='$_GET[thang]' 
-group by a.kdprogram)
+        // --- Bagian Koneksi Database ---
+        include "application/connect.php"; // Asumsi path sudah benar dari root project
 
-union (SELECT '' as id_pagu, '' as kdprogram, a.kdwasgiat, '' as nmwasgiat, a.kdkotama, a.kdsatker,  a.thang, a.kdgiat as kode, concat('1',a.kdprogram,a.kdgiat) as display, b.nmgiat as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi 
-FROM dipa a 
-left join t_giat b on a.kdprogram=b.kdprogram and a.kdgiat=b.kdgiat
-where  a.kdkotama='$_SESSION[kdkotama]' and a.kdsatker='$_SESSION[kdsatker]' and a.thang='$_GET[thang]' 
-group by a.kdprogram,a.kdgiat)
-
-union (SELECT '' as id_pagu, '' as kdprogram, a.kdwasgiat, '' as nmwasgiat, a.kdkotama, a.kdsatker,  a.thang, a.kdoutput as kode, concat('1',a.kdprogram,a.kdgiat,a.kdoutput) as display, b.nmoutput as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi 
-FROM dipa a 
-left join t_output b on a.kdprogram=b.kdprogram and a.kdgiat=b.kdgiat and a.kdoutput=b.kdoutput
-where  a.kdkotama='$_SESSION[kdkotama]' and a.kdsatker='$_SESSION[kdsatker]' and a.thang='$_GET[thang]' 
-group by a.kdprogram,a.kdgiat,a.kdoutput)
-
-union (SELECT '' as id_pagu,  '' as kdprogram, kdwasgiat, '' as nmwasgiat, kdkotama, kdsatker, thang, kdakun as kode, concat('1',kdprogram,kdgiat,kdoutput,kdakun) as display, nmakun as uraian,  
-sum(pagu) as pagu, sum(revisi) as revisi, sum(pagurevisi) as pagurevisi 
-FROM dipa 
-where  kdkotama='$_SESSION[kdkotama]' and kdsatker='$_SESSION[kdsatker]' and thang='$_GET[thang]' 
-group by  kdprogram, kdgiat,kdoutput,kdakun)
-union (SELECT '' as id_pagu,  kdprogram, kdwasgiat, '' as nmwasgiat, kdkotama, kdsatker, thang, kdakun as kode, concat('1',kdprogram,kdgiat,kdoutput,kdakun, kdsakun) as display,  concat('> ',nmsakun) as uraian,  
-sum(pagu) as pagu, sum(revisi) as revisi, sum(pagurevisi) as pagurevisi 
-FROM dipa 
-where  kdkotama='$_SESSION[kdkotama]' and kdsatker='$_SESSION[kdsatker]' and thang='$_GET[thang]' 
-group by  kdprogram, kdgiat,kdoutput,kdakun,kdsakun)
-union (SELECT a.id_pagu, '' as kdprogram, a.kdwasgiat, b.nmwasgiat, a.kdkotama, a.kdsatker, a.thang, '' as kode, concat('1',a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun, a.kdsakun,a.urutitem) as display, concat('-',' ', a.nmitem) as uraian, sum(a.pagu) as pagu, sum(a.revisi) as revisi, sum(a.pagurevisi) as pagurevisi  FROM dipa a left join t_wasgiat b on a.kdwasgiat=b.kdwasgiat  where  a.kdkotama='$_SESSION[kdkotama]' and a.kdsatker='$_SESSION[kdsatker]' and a.thang='$_GET[thang]' group by a.id_pagu order by a.noitem, a.id_pagu) order by display";
+        if (!isset($conn_status_ok) || !$conn_status_ok) {
+            die("Error: Koneksi database belum terjalin atau gagal di pagu.php. Periksa file application/connect.php dan status database Anda.");
+        }
+        // --- Akhir Bagian Koneksi Database ---
 
 
+        include "library/indotgl_angka.php";
 
+        // Menggunakan mysql_real_escape_string (meskipun deprecated, ini sesuai permintaan Anda)
+        $thang_escaped = isset($_GET['thang']) ? mysql_real_escape_string($_GET['thang']) : '';
+        $session_kdkotama = isset($_SESSION['kdkotama']) ? mysql_real_escape_string($_SESSION['kdkotama']) : '';
+        $session_kdsatker = isset($_SESSION['kdsatker']) ? mysql_real_escape_string($_SESSION['kdsatker']) : '';
 
-		$ok = mysql_query($query);
- 
-print "<table width='90%' align='center'><tr><td><a href='media.php?module=inputpagudipa&kdkotama=$_SESSION[kdkotama]&kdsatker=$_SESSION[kdsatker]&thang=$_GET[thang]' style='text-decoration:none'><div class='codehim-tombol-biru'><input type='button' value='Tambah Data'  ></div></td></tr></table><br>";
+        echo "<br><table width='1100' align='center' ><tr><td class='judulsubcontent' align='center'>PEREKAMAN DATA DIPA PETIKAN SATKER TA " . htmlspecialchars($thang_escaped) . "</td></tr></table>";
 
-	print "<table width='90%'  align='center' class='bordered'>";
-	print "<tr height='40' >";
-	print    "<th align='center'>NO</th>";
-	print    "<th align='center'>URAIAN</th>";
-	print    "<th align='center' width='30'>KODE PROGRAM</th>";
-	print    "<th align='center' width='125'>PAGU</th>";
-	print    "<th align='center' width='125'>REVISI (+/-)</th>";
-	print    "<th align='center' width='125'>PAGU STLH REVISI</th>";
-	print    "<th align='center' width='100'>WASGIAT</th>";
-	print    "<th   colspan='2' align='center' valign='middle' >AKSI</th>";
-  	print "</tr>";
-	
-	$no=1;
-	$tempNo = null;
-	
-	$romawi=1;
-    $tempRomawi = null;
-		
-while($k = mysql_fetch_array($ok)){
+        // Kueri SQL dengan perbaikan GROUP BY
+        $query_sql = "
+        SELECT
+            '' as id_pagu,
+            '' as kdprogram,
+            MAX(a.kdwasgiat) as kdwasgiat,
+            '' as nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            '' as kode,
+            '1' as display,
+            'RUPIAH MURNI' as uraian,
+            sum(a.pagu) as pagu,
+            sum(a.revisi) as revisi,
+            sum(a.pagurevisi) as pagurevisi
+        FROM dipa a
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.kdkotama, a.kdsatker, a.thang
 
-    $pagu	 = number_format($k[pagu],0,',','.');
-	$revisi	 = number_format($k[revisi],0,',','.');
-	$hasil	 = number_format($k[pagurevisi],0,',','.');
-	
-	$uraian = strtoupper($k[uraian]);
-	//$kd1 = substr($k[display],3,2);
-	$kd2 = substr($k[display],3,4);
-	$kd3 = substr($k[display],7,3);
-	$kd4 = substr($k[display],10,6);
-	$kd5 = substr($k[display],16,3);
-	
-	$str = $k[display];
-    $pj = strlen($str);
-	
-	// if ($pj=='3')  {	  
-	//	   $no++;
-	//	   $no_urut = $no.".";
-	//} else { $no_urut=''; }
-	
-	if ($pj=='16') print"<tr bgcolor='#fcfcc0'>"; else print"<tr>";
-	
-	if ($pj=='3') {	
-		if ($romawi=='1') {
-		print "<td  valign='top' ><b>A.</b></td>";
-        } else if ($romawi=='2') {
-		print "<td  valign='top' ><b>B.</b></td>";
-		} else if ($romawi=='3') {
-		print "<td  valign='top' ><b>C.</b></td>";	
-		} else if ($romawi=='4') {
-		print "<td  valign='top' ><b>D.</b></td>";	
-		} else if ($romawi=='5') {
-		print "<td  valign='top' ><b>E.</b></td>";		
-		} else {
-		print "<td  valign='top' ><b>F.</b></td>";
-		}
-		$tempRomawi = $romawi;
-        $romawi++;			
-	   
-	
-	} else if ($pj=='7') {	
-		if($tempRomawi != $romawi)
-		{
-			$no='1';
-			$tempRomawi = $romawi;
-		}else{
-		
-		}	
-		print "<td  valign='top' align='center'><b>$no.</b></td>";
-		
-		$tempNo = $no;
-        $no++;		
-		
-	} else if ($pj=='10') {	
-		if ($tempNo != $no) 
-		{
-			$abjad='a';
-			$tempNo = $no;
-			$tempRomawi = $romawi;
-		}else{
-		
-		}
-		print "<td  valign='top' align='center'><b>$abjad.</b></td>";
-			$tempAbjad = $abjad;
-		    $abjad++;
-	
-	
-	
-	} else if ($pj=='16') {	
-		if($tempAbjad != $abjad)
-		{
-			$nomor=1;
-			$tempAbjad = $abjad;
-		}else{
-			$nomor++;	
-		}
-	    print "<td  valign='top' align='right'><b>$nomor)</b></td>";
-	   
-	} else {
-	 print "<td  valign='top' align='right'></td>";
-	}
-		
-		
-		
-		
+        UNION ALL
 
-		 print "
-				<td  valign='top'>"; 
-				if ($pj=='20') print "<i>$uraian</i>"; else if ($pj<'20') print "<b>$k[uraian]</b>"; else print "$k[uraian]"; print"</td>
-				<td  valign='top' align='right'>"; if ($pj<'20') print "<b>$k[kode]</b>"; else print "$k[kode]"; print"</td>
-				<td  valign='top' align='right'>"; if ($pj<'20') print "<b>$pagu</b>"; else print "$pagu"; print"</td>	
-				<td  valign='top' align='right'>"; if ($pj<'20') print "<b>$revisi</b>"; else print "$revisi"; print"</td>	
-				<td  valign='top' align='right'>"; if ($pj<'20') print "<b>$hasil</b>"; else print "$hasil"; print"</td>
-				<td  valign='top' >"; if ($pj<'20') print "<b>$k[nmwasgiat]</b>"; else print "$k[nmwasgiat]"; print"</td>";
-		if ($pj=='19') { print "<td colspan='2' align='center'><a href='media.php?module=rekamdetaildipa&kdprogram=$k[kdprogram]&kdgiat=$kd2&kdoutput=$kd3&kdakun=$kd4&kdsakun=$kd5&kdkotama=$_SESSION[kdkotama]&kdsatker=$_SESSION[kdsatker]&thang=$_GET[thang]' data-tooltip='Tambah Uraian' data-position='top' class='top'>
-		<img src='images/add.png' width='20' ></a></td>"; 
-		
-		} else { 
-	
-		print	"<td  valign='top' align='center'>"; if ($pj>'20') print "<a href='media.php?module=editpagudipa&id_pagu=$k[id_pagu]&thang=$k[thang]' data-tooltip='Edit Pagu' data-position='top' class='top'>
-		<img src='images/edit.png' width='20' ></a>"; else print ""; print "</td>"; 
-		print"<td  valign='top' align='center'>"; if ($pj>'20') print "<a href=\"pagu/proses.php?aksi=hapus&id_pagu=$k[id_pagu]&thang=$k[thang]\" 
-					onClick=\"return confirm('APAKAH ANDA AKAN MENGHAPUS  ~ $k[uraian] ~? ')\" data-tooltip='Hapus Pagu' data-position='top' class='top'>
-				<img src='images/delete.png' width='20' ></a>"; else print ""; print "</td>"; 
-		}							
-		print "</tr>";	
-	//$no++;	
-   }
-	print "</table><br>"; 
-?>
+        SELECT
+            '' as id_pagu,
+            a.kdprogram,
+            MAX(a.kdwasgiat) as kdwasgiat,
+            '' as nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            concat('012.','22.',a.kdprogram) as kode,
+            concat('1',a.kdprogram) as display,
+            b.nmprogram as uraian,
+            sum(a.pagu) as pagu,
+            sum(a.revisi) as revisi,
+            sum(a.pagurevisi) as pagurevisi
+        FROM dipa a
+        LEFT JOIN t_program b ON a.kdprogram=b.kdprogram
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.kdprogram, b.nmprogram, a.kdkotama, a.kdsatker, a.thang
+
+        UNION ALL
+
+        SELECT
+            '' as id_pagu,
+            a.kdprogram,
+            MAX(a.kdwasgiat) as kdwasgiat,
+            '' as nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            a.kdgiat as kode,
+            concat('1',a.kdprogram,a.kdgiat) as display,
+            b.nmgiat as uraian,
+            sum(a.pagu) as pagu,
+            sum(a.revisi) as revisi,
+            sum(a.pagurevisi) as pagurevisi
+        FROM dipa a
+        LEFT JOIN t_giat b ON a.kdprogram=b.kdprogram AND a.kdgiat=b.kdgiat
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.kdprogram, a.kdgiat, b.nmgiat, a.kdkotama, a.kdsatker, a.thang
+
+        UNION ALL
+
+        SELECT
+            '' as id_pagu,
+            a.kdprogram,
+            MAX(a.kdwasgiat) as kdwasgiat,
+            '' as nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            a.kdoutput as kode,
+            concat('1',a.kdprogram,a.kdgiat,a.kdoutput) as display,
+            b.nmoutput as uraian,
+            sum(a.pagu) as pagu,
+            sum(a.revisi) as revisi,
+            sum(a.pagurevisi) as pagurevisi
+        FROM dipa a
+        LEFT JOIN t_output b ON a.kdprogram=b.kdprogram AND a.kdgiat=b.kdgiat AND a.kdoutput=b.kdoutput
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.kdprogram, a.kdgiat, a.kdoutput, b.nmoutput, a.kdkotama, a.kdsatker, a.thang
+
+        UNION ALL
+
+        SELECT
+            '' as id_pagu,
+            '' as kdprogram,
+            MAX(a.kdwasgiat) as kdwasgiat,
+            '' as nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            a.kdakun as kode,
+            concat('1',a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun) as display,
+            a.nmakun as uraian,
+            sum(a.pagu) as pagu,
+            sum(a.revisi) as revisi,
+            sum(a.pagurevisi) as pagurevisi
+        FROM dipa a
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.kdprogram, a.kdgiat, a.kdoutput, a.kdakun, a.nmakun, a.kdkotama, a.kdsatker, a.thang
+
+        UNION ALL
+
+        SELECT
+            '' as id_pagu,
+            a.kdprogram,
+            MAX(a.kdwasgiat) as kdwasgiat,
+            '' as nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            a.kdakun as kode,
+            concat('1',a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun, a.kdsakun) as display,
+            concat('> ',a.nmsakun) as uraian,
+            sum(a.pagu) as pagu,
+            sum(a.revisi) as revisi,
+            sum(a.pagurevisi) as pagurevisi
+        FROM dipa a
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.kdprogram, a.kdgiat, a.kdoutput, a.kdakun, a.kdsakun, a.nmsakun, a.kdkotama, a.kdsatker, a.thang
+
+        UNION ALL
+
+        SELECT
+            a.id_pagu,
+            a.kdprogram,
+            a.kdwasgiat,
+            b.nmwasgiat,
+            a.kdkotama,
+            a.kdsatker,
+            a.thang,
+            '' as kode,
+            concat('1',a.kdprogram,a.kdgiat,a.kdoutput,a.kdakun, a.kdsakun,a.urutitem) as display,
+            concat('-',' ', a.nmitem) as uraian,
+            a.pagu,
+            a.revisi,
+            a.pagurevisi
+        FROM dipa a
+        LEFT JOIN t_wasgiat b ON a.kdwasgiat=b.kdwasgiat
+        WHERE a.kdkotama='$session_kdkotama' AND a.kdsatker='$session_kdsatker' AND a.thang='$thang_escaped'
+        GROUP BY a.id_pagu, a.kdprogram, a.kdwasgiat, b.nmwasgiat, a.kdkotama, a.kdsatker, a.thang, a.urutitem, a.nmitem, a.pagu, a.revisi, a.pagurevisi
+        ";
+        // Final ORDER BY untuk seluruh UNION
+        $final_query = $query_sql . " ORDER BY display";
+
+        // Eksekusi kueri menggunakan mysql_query
+        $ok = mysql_query($final_query);
+        if (!$ok) {
+            die('Kueri utama gagal (pagu.php): ' . mysql_error()); // Menampilkan error MySQL spesifik
+        }
+
+        echo "<table width='90%' align='center'><tr><td><a href='media.php?module=inputpagudipa&kdkotama=".htmlspecialchars($session_kdkotama)."&kdsatker=".htmlspecialchars($session_kdsatker)."&thang=".htmlspecialchars($thang_escaped)."' style='text-decoration:none'><div class='codehim-tombol-biru'><input type='button' value='Tambah Data' ></div></td></tr></table><br>";
+
+        echo "<table width='90%' align='center' class='bordered'>";
+        echo "<tr height='40' >";
+        echo     "<th align='center'>NO</th>";
+        echo     "<th align='center'>URAIAN</th>";
+        echo     "<th align='center' width='30'>KODE PROGRAM</th>";
+        echo     "<th align='center' width='125'>PAGU</th>";
+        echo     "<th align='center' width='125'>REVISI (+/-)</th>";
+        echo     "<th align='center' width='125'>PAGU STLH REVISI</th>";
+        echo     "<th align='center' width='100'>WASGIAT</th>";
+        echo     "<th colspan='2' align='center' valign='middle' >AKSI</th>";
+        echo "</tr>";
+
+        // Inisialisasi semua variabel counter dan display
+        // PERBAIKAN: Pastikan ini benar-benar diinisialisasi untuk setiap iterasi loop (tidak diperlukan untuk PHP 5.x)
+        // Jika Anda masih mendapatkan notice, meskipun secara teknis ini sudah benar di luar loop,
+        // terkadang penanganan error PHP bisa terlalu ketat.
+        // Solusi yang lebih "kasar" tetapi menghilangkan notice adalah dengan menginisialisasi
+        // variabel ini di dalam loop, atau menekan notice dengan @ (tidak disarankan).
+        // Saya akan tetap membiarkan inisialisasi di luar loop karena ini adalah praktik terbaik.
+        $no = 1;
+        $romawi_counter = 1;
+        $abjad_counter = 1;
+        $nomor_counter = 1;
+
+        // Ambil hasil kueri menggunakan mysql_fetch_array
+        while($k = mysql_fetch_array($ok)){
+
+            $pagu_val = isset($k['pagu']) ? $k['pagu'] : 0;
+            $revisi_val = isset($k['revisi']) ? $k['revisi'] : 0;
+            $pagurevisi_val = isset($k['pagurevisi']) ? $k['pagurevisi'] : 0;
+            $uraian_val = isset($k['uraian']) ? $k['uraian'] : '';
+            $kode_val = isset($k['kode']) ? $k['kode'] : '';
+            $nmwasgiat_val = isset($k['nmwasgiat']) ? $k['nmwasgiat'] : '';
+            $id_pagu_val = isset($k['id_pagu']) ? $k['id_pagu'] : '';
+            $thang_k_val = isset($k['thang']) ? $k['thang'] : '';
+            $display_val = isset($k['display']) ? $k['display'] : '';
+
+            $pagu   = number_format($pagu_val,0,',','.');
+            $revisi = number_format($revisi_val,0,',','.');
+            $hasil  = number_format($pagurevisi_val,0,',','.');
+
+            $uraian = strtoupper($uraian_val);
+
+            $str = $display_val;
+            $pj = strlen($str);
+
+            if ($pj == '19') { echo "<tr bgcolor='#fcfcc0'>"; } else { echo "<tr>"; }
+
+            echo "<td valign='top'>";
+            if ($pj == '1') {
+                $romawi_char = '';
+                if ($romawi_counter == 1) $romawi_char = 'A';
+                else if ($romawi_counter == 2) $romawi_char = 'B';
+                else if ($romawi_counter == 3) $romawi_char = 'C';
+                else if ($romawi_counter == 4) $romawi_char = 'D';
+                else if ($romawi_counter == 5) $romawi_char = 'E';
+                else $romawi_char = 'F';
+                echo "<b>".$romawi_char.".</b>";
+                $romawi_counter++;
+                // PERBAIKAN: Reset sub-counters saat level utama berubah
+                $no = 1;
+                $abjad_counter = 1;
+                $nomor_counter = 1;
+            } else if ($pj == '3') {
+                echo "&nbsp;&nbsp;<b>".$no.".</b>";
+                $no++;
+                // PERBAIKAN: Reset sub-counters saat level program berubah
+                $abjad_counter = 1;
+                $nomor_counter = 1;
+            } else if ($pj == '7') {
+                echo "&nbsp;&nbsp;&nbsp;&nbsp;<b>".chr(ord('a') + ($abjad_counter - 1)).".</b>";
+                $abjad_counter++;
+                // PERBAIKAN: Reset sub-counter saat level giat berubah
+                $nomor_counter = 1;
+            } else if ($pj == '10') {
+                echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>".$nomor_counter.")</b>";
+                $nomor_counter++;
+            } else {
+                echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+            echo "</td>";
+
+            echo "<td valign='top'>";
+            if ($pj == '1') echo "<b>".htmlspecialchars($uraian)."</b>";
+            else if ($pj == '3') echo "<b>".htmlspecialchars($uraian)."</b>";
+            else if ($pj == '7') echo "<b>".htmlspecialchars($uraian)."</b>";
+            else if ($pj == '10') echo "<b>".htmlspecialchars($uraian)."</b>";
+            else if ($pj == '16') echo "<b>".htmlspecialchars($uraian)."</b>";
+            else if ($pj == '19') echo "<i>".htmlspecialchars($uraian)."</i>";
+            else echo htmlspecialchars($uraian);
+            echo "</td>";
+
+            echo "<td valign='top' align='right'>";
+            echo htmlspecialchars($kode_val);
+            echo "</td>";
+
+            echo "<td valign='top' align='right'>";
+            echo $pagu;
+            echo "</td>";
+
+            echo "<td valign='top' align='right'>";
+            echo $revisi;
+            echo "</td>";
+
+            echo "<td valign='top' align='right'>";
+            echo $hasil;
+            echo "</td>";
+
+            echo "<td valign='top' >";
+            echo htmlspecialchars($nmwasgiat_val);
+            echo "</td>";
+
+            echo "<td colspan='2' align='center'>";
+            if ($pj == '19' ) {
+                echo "<a href='media.php?module=editpagudipa&id_pagu=".htmlspecialchars($id_pagu_val)."&thang=".htmlspecialchars($thang_k_val)."' data-tooltip='Edit Pagu' data-position='top' class='top'><img src='images/edit.png' width='20' ></a>";
+                echo "&nbsp;&nbsp;";
+                echo "<a href=\"pagu/proses.php?aksi=hapus&id_pagu=".htmlspecialchars($id_pagu_val)."&thang=".htmlspecialchars($thang_k_val)."\" onClick=\"return confirm('APAKAH ANDA AKAN MENGHAPUS ~ ".htmlspecialchars($uraian_val)." ~? ')\" data-tooltip='Hapus Pagu' data-position='top' class='top'><img src='images/delete.png' width='20' ></a>";
+            }
+            else if ($pj == '16' || $pj == '10' || $pj == '7' || $pj == '3' ) {
+                echo "<a href='media.php?module=rekamdetaildipa&kdprogram=".(isset($k['kdprogram']) ? htmlspecialchars($k['kdprogram']) : '')."&kdgiat=".(isset($k['kdgiat']) ? htmlspecialchars($k['kdgiat']) : '')."&kdoutput=".(isset($k['kdoutput']) ? htmlspecialchars($k['kdoutput']) : '')."&kdakun=".(isset($k['kdakun']) ? htmlspecialchars($k['kdakun']) : '')."&kdsakun=".(isset($k['kdsakun']) ? htmlspecialchars($k['kdsakun']) : '')."&kdkotama=".htmlspecialchars($session_kdkotama)."&kdsatker=".htmlspecialchars($session_kdsatker)."&thang=".htmlspecialchars($thang_escaped)."' data-tooltip='Tambah Uraian' data-position='top' class='top'><img src='images/add.png' width='20' ></a>";
+                echo "&nbsp;&nbsp;";
+            }
+            else {
+                echo "&nbsp;";
+            }
+            echo "</td>";
+            echo "</tr>";
+        }
+        echo "</table><br>";
+        ?>
+        <br></span></center><br>
+    </body>
+</html>

@@ -27,7 +27,7 @@
 
             $keyword=$_REQUEST['keyword'];
             $reload = "media.php?module=user&pagination=true&keyword=$keyword";
-            $result =  mysql_query("select  a.*, b.nmkotama, c.nmsatkr, d.pengguna, d.kdwasgiat from userlaplakgar a
+            $result =  mysql_query("select  a.*, b.nmkotama, c.nmsatkr, d.pengguna, d.kdwasgiat from user a
 							  left join t_kotam b on a.kdkotama=b.kdkotama
 							  left join t_satkr  c on a.kdkotama=c.kdkotama and a.kdsatker=c.kdsatkr  
 							  left join t_tingkat d on a.kdtingkat=d.kdtingkat where usernamelaplakgar LIKE '%$keyword%' or nmkotama LIKE '%$keyword%' ORDER BY usernamelaplakgar");
@@ -35,7 +35,7 @@
         }else{
 //            jika tidak ada pencarian pakai ini
             $reload = "media.php?module=user&pagination=true";
-            $result =  mysql_query("select  a.*, b.nmkotama, c.nmsatkr, d.pengguna, d.kdwasgiat from userlaplakgar a
+            $result =  mysql_query("select  a.*, b.nmkotama, c.nmsatkr, d.pengguna, d.kdwasgiat from user a
 							  left join t_kotam b on a.kdkotama=b.kdkotama
 							  left join t_satkr  c on a.kdkotama=c.kdkotama and a.kdsatker=c.kdsatkr  
 							  left join t_tingkat d on a.kdtingkat=d.kdtingkat");
@@ -121,7 +121,7 @@
 							  <td valign='top'>$data[jam]</td>
 							  <td  align='center' valign='top'><a href='media.php?module=edituser&id=$data[aidi_aidi_aidi]' data-tooltip='Edit User' data-position='top' class='top'>
 							  <img src='images/edit.png' width='20' ></a></td>
-							  <td  align='center' valign='top'><a href=\"pengelola/userlaplakgar/proses.php?aksi=hapus&aidi_aidi_aidi=$data[aidi_aidi_aidi]\" onClick=\"return confirm('APAKAH ANDA AKAN MENGHAPUS  ~ $data[usernamelaplakgar] ~? ')\" data-tooltip='Hapus User' data-position='top' class='top'><img src='images/delete.png' width='20' ></td>	
+							  <td  align='center' valign='top'><a href=\"pengelola/user/proses.php?aksi=hapus&aidi_aidi_aidi=$data[aidi_aidi_aidi]\" onClick=\"return confirm('APAKAH ANDA AKAN MENGHAPUS  ~ $data[usernamelaplakgar] ~? ')\" data-tooltip='Hapus User' data-position='top' class='top'><img src='images/delete.png' width='20' ></td>	
 			
 	 
                     </tr>"; 

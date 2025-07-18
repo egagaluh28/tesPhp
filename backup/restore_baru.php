@@ -84,7 +84,7 @@ function restoreMysqlDB($filePath, $conn)
             $sql .= $line;
             
             if (substr(trim($line), - 1, 1) == ';') {
-             //   $result = mysqli_query($conn, $sql);
+             //   $result = mysql_query($conn, $sql);
 			      $result = mysql_query($sql);
                 if (! $result) {
                     $error .= mysql_error($conn) . "\n";

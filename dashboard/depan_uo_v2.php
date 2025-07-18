@@ -29,20 +29,22 @@ where  a.thang='2024'
 group by   a.thang"); 
 $hasil = mysql_fetch_array($jml_daerah);	
 
-	$pagu 			= number_format($hasil[pagu],0,',','.');
-	$revisi 		= number_format($hasil[revisi],0,',','.');
-	$pagurevisi		= number_format($hasil[pagurevisi],0,',','.');
-	$realisasi		= number_format($hasil[realisasi],0,',','.');
-	
-	if (($hasil[pagurevisi]=='') or ($hasil[pagurevisi]=='0')) {
-	$prosen     = 0; 
-    } else { 
-	$prosen 	= (($hasil[realisasi]/$hasil[pagurevisi])*100);
-	}
-	$prosen_des	= number_format($prosen,2,',','.');
-	
-	$sisa = $hasil[pagurevisi] - $hasil[realisasi];
-	$sisa_des = number_format($sisa,0,',','.');
+	$pagu       = number_format($hasil['pagu'], 0, ',', '.');
+$revisi     = number_format($hasil['revisi'], 0, ',', '.');
+$pagurevisi = number_format($hasil['pagurevisi'], 0, ',', '.');
+$realisasi  = number_format($hasil['realisasi'], 0, ',', '.');
+
+if (($hasil['pagurevisi'] == '') || ($hasil['pagurevisi'] == '0')) {
+    $prosen = 0; 
+} else {
+    $prosen = (($hasil['realisasi'] / $hasil['pagurevisi']) * 100);
+}
+
+$prosen_des = number_format($prosen, 2, ',', '.');
+
+$sisa = $hasil['pagurevisi'] - $hasil['realisasi'];
+$sisa_des = number_format($sisa, 0, ',', '.');
+
 
 ?>
 
@@ -60,10 +62,10 @@ $hasil = mysql_fetch_array($jml_daerah);
 	<tr>
 		<td align="center">1</td>
 		<td >RUPIAH MURNI</td>
-		<td align="right"><?php print "$pagurevisi";?></td>
-		<td align="right"><?php print "$realisasi";?></td>
-		<td align="right"><?php print "$prosen_des";?> %</td>
-		<td align="right"><?php print "$sisa_des";?></td>
+		<td align="right"><?php print ".$pagurevisi";?></td>
+		<td align="right"><?php print ".$realisasi";?></td>
+		<td align="right"><?php print ".$prosen_des";?> %</td>
+		<td align="right"><?php print ".$sisa_des";?></td>
 	</tr>
 <?php
 
@@ -134,10 +136,10 @@ $hasil2 = mysql_fetch_array($jml_bpjs);
 	
 	<tr><td align="center">3</td>
 		<td >BPJS</td>
-		<td align="right"><?php print "$pagurevisi2";?></td>
-		<td align="right"><?php print "$realisasi2";?></td>
-		<td align="right"><?php print "$prosen_des2";?> %</td>
-		<td align="right"><?php print "$sisa_des2";?></td>
+		<td align="right"><?php print ".$pagurevisi2";?></td>
+		<td align="right"><?php print ".$realisasi2";?></td>
+		<td align="right"><?php print ".$prosen_des2";?> %</td>
+		<td align="right"><?php print ".$sisa_des2";?></td>
 	</tr>
 
 
