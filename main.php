@@ -532,7 +532,6 @@ case "editrealisasi_dptyanmasum"	 	: include "se_realisasidptyanmasum/edit.php";
 
 case "realisasidptyanmasum_ktm"	 		: include "se_realisasidptyanmasum/realisasi_ktm.php";break;
 
-
 //2.pendapatan bpjs
 case "target_dptbpjs"	 			: include "se_dptbpjs/terget.php";break;
 case "inputtarget_dptbpjs"	 		: include "se_dptbpjs/input.php";break;
@@ -547,10 +546,10 @@ case "form_dptbpjs_ktm"	 			: include "form/form_dptbpjs_ktm.php";break;
 
 
 case "realisasidptbpjs"	 			: include "se_realisasidptbpjs/realisasi.php";break;
-case "inputrealisasi_dptbpjs"	 	: include "se_realisasidptbpjs/input.php";break;
-case "editrealisasi_dptbpjs"	 	: include "se_realisasidptbpjs/edit.php";break;
+case "inputrealisasi_dptbpjs"	 	: include "se_realisasidptyanmasum/input.php";break;
+case "editrealisasi_dptbpjs"	 	: include "se_realisasidptyanmasum/edit.php";break;
 
-case "realisasidptbpjs_ktm"	 		: include "se_realisasidptbpjs/realisasi_ktm.php";break;
+case "realisasidptbpjs_ktm"	 		: include "se_realisasidptyanmasum/realisasi_ktm.php";break;
 
 //3.Yanmasum se
 case "paguyanmasum_se"	 			: include "se_yanmasum/pagu.php";break;

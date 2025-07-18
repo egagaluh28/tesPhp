@@ -11,7 +11,7 @@ function escape_data($data) {
     if (function_exists('mysql_real_escape_string')) {
         return mysql_real_escape_string($data);
     } else {
-        return addslashes($data);
+        return addslashes($data); // Fallback jika mysql_real_escape_string tidak tersedia (PHP 7+), tapi tidak seaman itu
     }
 }
 
@@ -22,8 +22,8 @@ if ($_GET['aksi'] == 'simpan') {
     $idx = isset($_POST['kdkotama']) ? escape_data($_POST['kdkotama']) : '';
     $idx1 = isset($_POST['kdsatker']) ? escape_data($_POST['kdsatker']) : '';
 
-    $saiki = date('ymdHis');
-    $id_pagu = $saiki . "" . $idx1;
+    $saiki = date('ymdHis'); // Current time: 250718134107
+    $id_pagu = $saiki . "" . $idx1; // Contoh: 250718134107344453
 
     $insert_query = "INSERT INTO dipa
                              (id_pagu,
@@ -52,7 +52,7 @@ if ($_GET['aksi'] == 'simpan') {
                               pagurevisi,
                               nmakun,
                               nmsakun,
-                              pengembalian) 
+                              pengembalian)
                           VALUES(
                               '$id_pagu',
                               '" . escape_data($_POST['kdwasgiat']) . "',
@@ -80,12 +80,12 @@ if ($_GET['aksi'] == 'simpan') {
                               '" . escape_data($_POST['pagurevisi']) . "',
                               '" . escape_data($_POST['nmakun']) . "',
                               '" . escape_data($_POST['nmsakun']) . "',
-                              '0' )"; // PERBAIKAN: Hapus 'userlaplakgar' dan komentar di sini
+                              '0' )"; // PERBAIKAN: Pastikan tidak ada string ekstra di sini
 
     $insert_result = mysql_query($insert_query);
 
     if (!$insert_result) {
-        die("Gagal menyimpan data ke DIPA: " . mysql_error() . "<br>Kueri: " . $insert_query);
+        die("Gagal menyimpan data ke DIPA: " . mysql_error() . "<br>Kueri: " . htmlspecialchars($insert_query));
     }
 
     ?><script language="JavaScript">;
@@ -136,12 +136,12 @@ if ($_GET['aksi'] == 'simpan') {
                                 pagurevisi   = '" . escape_data($_POST['pagurevisi']) . "',
                                 nmakun       = '" . escape_data($_POST['nmakun']) . "',
                                 nmsakun      = '" . escape_data($_POST['nmsakun']) . "',
-                                pengembalian = '0' -- Hapus 'userlaplakgaruserlaplakgar' dan komentar di sini
+                                pengembalian = '0'
                            WHERE id_pagu  = '" . $id_pagu_escaped . "'";
 
     $update_dipa_result = mysql_query($update_dipa_query);
 
-    if (!$update_dipa_result) { die("Gagal mengubah data DIPA: " . mysql_error() . "<br>Kueri: " . $update_dipa_query); }
+    if (!$update_dipa_result) { die("Gagal mengubah data DIPA: " . mysql_error() . "<br>Kueri: " . htmlspecialchars($update_dipa_query)); }
 
     $update_realisasi_query = "UPDATE realisasi SET
                                 thang       = '" . $thang_escaped . "',
@@ -161,7 +161,7 @@ if ($_GET['aksi'] == 'simpan') {
 
     $update_realisasi_result = mysql_query($update_realisasi_query);
 
-    if (!$update_realisasi_result) { die("Gagal mengubah data realisasi: " . mysql_error() . "<br>Kueri: " . $update_realisasi_query); }
+    if (!$update_realisasi_result) { die("Gagal mengubah data realisasi: " . mysql_error() . "<br>Kueri: " . htmlspecialchars($update_realisasi_query)); }
 
     ?><script language="JavaScript">;
     document.location='<?php print "../media.php?module=pagudipa&thang=" . htmlspecialchars($thang_escaped); ?>'</script><?php

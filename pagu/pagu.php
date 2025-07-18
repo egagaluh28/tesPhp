@@ -16,8 +16,12 @@
         }
 
         // --- Bagian Koneksi Database ---
-        include "application/connect.php"; // Asumsi path sudah benar dari root project
+        // Include file koneksi.php. Ini akan mencoba membuat koneksi database.
+        include "application/connect.php";
 
+        // Cek apakah koneksi berhasil (berdasarkan variabel $conn_status_ok dari connect.php)
+        // Seharusnya `die()` di `connect.php` sudah menangani kegagalan koneksi utama,
+        // tapi ini adalah pengecekan tambahan jika ada masalah lain setelah include.
         if (!isset($conn_status_ok) || !$conn_status_ok) {
             die("Error: Koneksi database belum terjalin atau gagal di pagu.php. Periksa file application/connect.php dan status database Anda.");
         }
@@ -200,18 +204,6 @@
         echo     "<th colspan='2' align='center' valign='middle' >AKSI</th>";
         echo "</tr>";
 
-        // Inisialisasi semua variabel counter dan display
-        // PERBAIKAN: Pastikan ini benar-benar diinisialisasi untuk setiap iterasi loop (tidak diperlukan untuk PHP 5.x)
-        // Jika Anda masih mendapatkan notice, meskipun secara teknis ini sudah benar di luar loop,
-        // terkadang penanganan error PHP bisa terlalu ketat.
-        // Solusi yang lebih "kasar" tetapi menghilangkan notice adalah dengan menginisialisasi
-        // variabel ini di dalam loop, atau menekan notice dengan @ (tidak disarankan).
-        // Saya akan tetap membiarkan inisialisasi di luar loop karena ini adalah praktik terbaik.
-        $no = 1;
-        $romawi_counter = 1;
-        $abjad_counter = 1;
-        $nomor_counter = 1;
-
         // Ambil hasil kueri menggunakan mysql_fetch_array
         while($k = mysql_fetch_array($ok)){
 
@@ -247,20 +239,17 @@
                 else $romawi_char = 'F';
                 echo "<b>".$romawi_char.".</b>";
                 $romawi_counter++;
-                // PERBAIKAN: Reset sub-counters saat level utama berubah
                 $no = 1;
                 $abjad_counter = 1;
                 $nomor_counter = 1;
             } else if ($pj == '3') {
                 echo "&nbsp;&nbsp;<b>".$no.".</b>";
                 $no++;
-                // PERBAIKAN: Reset sub-counters saat level program berubah
                 $abjad_counter = 1;
                 $nomor_counter = 1;
             } else if ($pj == '7') {
                 echo "&nbsp;&nbsp;&nbsp;&nbsp;<b>".chr(ord('a') + ($abjad_counter - 1)).".</b>";
                 $abjad_counter++;
-                // PERBAIKAN: Reset sub-counter saat level giat berubah
                 $nomor_counter = 1;
             } else if ($pj == '10') {
                 echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>".$nomor_counter.")</b>";

@@ -2,8 +2,8 @@
 <head>
 <script language="javascript" src="library/jquery-1.2.6.js"></script>
 
-<?php // PERBAIKAN: Selalu mulai dengan <?php
-// Mulai sesi jika belum dimulai
+<?php
+// PERBAIKAN: Mulai sesi jika belum dimulai
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,55 +11,60 @@ if (session_status() == PHP_SESSION_NONE) {
 // PERBAIKAN: Include connect.php di awal
 include "application/connect.php";
 
-// PERBAIKAN: Pengecekan koneksi
+// PERBAIKAN: Pengecekan koneksi database
 if (!isset($conn_status_ok) || !$conn_status_ok) {
     die("Error: Koneksi database belum terjalin atau gagal di edit.php. Pastikan application/connect.php sudah benar dan database berjalan.");
 }
 
-print "<br><table width='1100' align='center' ><tr><td class='judulcontent' align='center'>EDIT DATA PAGU</td></tr></table><br>";
+echo "<br><table width='1100' align='center' ><tr><td class='judulcontent' align='center'>EDIT DATA PAGU</td></tr></table><br>";
 
-// PERBAIKAN: Escape $_GET['id_pagu'] untuk mencegah SQL Injection
+// PERBAIKAN: Escape input GET untuk mencegah SQL Injection
 $get_id_pagu = isset($_GET['id_pagu']) ? mysql_real_escape_string($_GET['id_pagu']) : '';
 
-$edit_query = "SELECT a.*, d.nmwasgiat, f.nmprogram, g.nmgiat, h.nmoutput,
-                         i.nmakun, j.nmsakun, k.nmkotama, l.nmsatkr, m.nmkusatker 
-                FROM dipa a
-                LEFT JOIN t_wasgiat d ON a.kdwasgiat=d.kdwasgiat
-                LEFT JOIN t_program f ON a.kdprogram=f.kdprogram
-                LEFT JOIN t_giat g ON a.kdprogram=g.kdprogram AND a.kdgiat=g.kdgiat
-                LEFT JOIN t_output h ON a.kdprogram=h.kdprogram AND a.kdgiat=h.kdgiat AND a.kdoutput=h.kdoutput
-                LEFT JOIN t_akun i ON a.kdakun=i.kdakun
-                LEFT JOIN t_sakun j ON a.kdprogram=j.kdprogram AND a.kdgiat=j.kdgiat AND a.kdoutput=j.kdoutput AND a.kdakun=j.kdakun AND a.kdsakun=j.kdsakun
-                LEFT JOIN t_kotam k ON a.kdkotama=k.kdkotama
-                LEFT JOIN t_satkr l ON a.kdkotama=l.kdkotama AND a.kdsatker=l.kdsatkr
-                LEFT JOIN t_kusatker m ON a.kdkusatker=m.kdkusatker
-                WHERE a.id_pagu='$get_id_pagu'";
+$edit_query = "
+    SELECT a.*, d.nmwasgiat, f.nmprogram, g.nmgiat, h.nmoutput,
+           i.nmakun, j.nmsakun, k.nmkotama, l.nmsatkr, m.nmkusatker
+    FROM dipa a
+    LEFT JOIN t_wasgiat d ON a.kdwasgiat=d.kdwasgiat
+    LEFT JOIN t_program f ON a.kdprogram=f.kdprogram
+    LEFT JOIN t_giat g ON a.kdprogram=g.kdprogram AND a.kdgiat=g.kdgiat
+    LEFT JOIN t_output h ON a.kdprogram=h.kdprogram AND a.kdgiat=h.kdgiat AND a.kdoutput=h.kdoutput
+    LEFT JOIN t_akun i ON a.kdakun=i.kdakun
+    LEFT JOIN t_sakun j ON a.kdprogram=j.kdprogram AND a.kdgiat=j.kdgiat AND a.kdoutput=j.kdoutput AND a.kdakun=j.kdakun AND a.kdsakun=j.kdsakun
+    LEFT JOIN t_kotam k ON a.kdkotama=k.kdkotama
+    LEFT JOIN t_satkr l ON a.kdkotama=l.kdkotama AND a.kdsatker=l.kdsatkr
+    LEFT JOIN t_kusatker m ON a.kdkusatker=m.kdkusatker
+    WHERE a.id_pagu='$get_id_pagu'";
 
-$edit = mysql_query($edit_query);
-if (!$edit) { // PERBAIKAN: Cek error kueri
+$edit_result = mysql_query($edit_query); // PERBAIKAN: Ganti nama variabel untuk menghindari konflik
+if (!$edit_result) {
     die("Kueri edit data pagu gagal: " . mysql_error());
 }
 
-$p = mysql_fetch_array($edit);
+$p = mysql_fetch_array($edit_result);
 
-// PERBAIKAN: Pastikan $p ada sebelum mengakses elemennya
-if ($p && isset($p['pagu']) && $p['pagu'] != '0') {
-    $pagu_formatted = number_format($p['pagu'], 0, ',', '.');
-} else {
-    $pagu_formatted = '';
+// PERBAIKAN: Pastikan data ditemukan. Jika tidak, arahkan atau tampilkan pesan.
+if (!$p) {
+    die("Data pagu tidak ditemukan untuk ID: " . htmlspecialchars($get_id_pagu));
 }
 
-// PERBAIKAN: Inisialisasi variabel untuk menghindari warning jika data tidak ada
+// Inisialisasi variabel dengan nilai dari database, dengan htmlspecialchars untuk keamanan XSS
+$pagu_val_raw = isset($p['pagu']) ? $p['pagu'] : 0;
+$pagu_formatted = ($pagu_val_raw != '0') ? number_format($pagu_val_raw, 0, ',', '.') : '';
+
 $p_thang = isset($p['thang']) ? htmlspecialchars($p['thang']) : '';
-$p_kdkotama = isset($p['kdkotama']) ? htmlspecialchars($p['kdkotama']) : '';
-$p_nmkotama = isset($p['nmkotama']) ? htmlspecialchars($p['nmkotama']) : '';
+$p_kddept = '012'; // Nilai tetap
+$p_kdunit = '22';  // Nilai tetap
 $p_kdsa = isset($p['kdsa']) ? htmlspecialchars($p['kdsa']) : '';
 $p_kdjd = isset($p['kdjd']) ? htmlspecialchars($p['kdjd']) : '';
+$p_kdkotama = isset($p['kdkotama']) ? htmlspecialchars($p['kdkotama']) : '';
+$p_nmkotama = isset($p['nmkotama']) ? htmlspecialchars($p['nmkotama']) : '';
 $p_kdsatker = isset($p['kdsatker']) ? htmlspecialchars($p['kdsatker']) : '';
 $p_nmsatkr = isset($p['nmsatkr']) ? htmlspecialchars($p['nmsatkr']) : '';
 $p_kdkusatker = isset($p['kdkusatker']) ? htmlspecialchars($p['kdkusatker']) : '';
 $p_nmkusatker = isset($p['nmkusatker']) ? htmlspecialchars($p['nmkusatker']) : '';
 $p_kdwasgiat = isset($p['kdwasgiat']) ? htmlspecialchars($p['kdwasgiat']) : '';
+$p_nmwasgiat = isset($p['nmwasgiat']) ? htmlspecialchars($p['nmwasgiat']) : '';
 $p_kdprogram = isset($p['kdprogram']) ? htmlspecialchars($p['kdprogram']) : '';
 $p_nmprogram = isset($p['nmprogram']) ? htmlspecialchars($p['nmprogram']) : '';
 $p_kdgiat = isset($p['kdgiat']) ? htmlspecialchars($p['kdgiat']) : '';
@@ -74,9 +79,9 @@ $p_nmsakun = isset($p['nmsakun']) ? htmlspecialchars($p['nmsakun']) : '';
 $p_noitem = isset($p['noitem']) ? htmlspecialchars($p['noitem']) : '';
 $p_urutitem = isset($p['urutitem']) ? htmlspecialchars($p['urutitem']) : '';
 $p_nmitem = isset($p['nmitem']) ? htmlspecialchars($p['nmitem']) : '';
-$p_pagu_raw = isset($p['pagu']) ? htmlspecialchars($p['pagu']) : ''; // Pagu raw untuk perhitungan JS
 $p_revisi = isset($p['revisi']) ? htmlspecialchars($p['revisi']) : '';
 $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '';
+
 
 ?>
    <center><div id="borderku1" >
@@ -97,8 +102,8 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
 
 			<tr>
 				  <td class="subyek1" valign="middle" align="right">BAG. GAR / UO :</td>
-				 <td valign="middle">  <input type="text" name="kddept" size="7" class="input-field" readonly value="012" style="text-align: center;"/>
-						<input type="text" name="kdunit" size="7" class="input-field" readonly value="22"
+				 <td valign="middle">  <input type="text" name="kddept" size="7" class="input-field" readonly value="<?php echo $p_kddept; ?>" style="text-align: center;"/>
+						<input type="text" name="kdunit" size="7" class="input-field" readonly value="<?php echo $p_kdunit; ?>"
 						style="text-align: center;"/>
 				 </td>
 
@@ -106,7 +111,7 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
                     echo "<td class='subyek1' valign='middle' align='right'>SUMBER ANGGARAN :</td>
                      <td valign='middle'><select name='kdsa' class='select-field' required='required'>
                             <option value='' selected>- Pilih -</option>";
-                    $sql_sa = "SELECT kdsa, nmsa FROM t_sa";
+                    $sql_sa = "SELECT kdsa, nmsa FROM t_sa ";
                     $qry_sa = mysql_query($sql_sa);
                     if (!$qry_sa) { die("Kueri sumber anggaran gagal: " . mysql_error()); }
                     while ($data_sa = mysql_fetch_array($qry_sa)){
@@ -128,7 +133,7 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
                     echo "<td class='subyek1' valign='middle' align='right'>JENIS DANA : </td>
                      <td valign='middle'><select name='kdjd' class='select-field' required='required'>
                             <option value='' selected>- - Pilih - -</option>";
-                    $sql_jd = "SELECT kdjd, nmjd FROM t_jd ORDER BY kdjd";
+                    $sql_jd = "SELECT kdjd, nmjd FROM t_jd ORDER BY kdjd ";
                     $qry_jd = mysql_query($sql_jd);
                     if (!$qry_jd) { die("Kueri jenis dana gagal: " . mysql_error()); }
                     while ($data_jd = mysql_fetch_array($qry_jd)){
@@ -159,7 +164,7 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
                 echo "<td class='subyek1' align='right'>WASGIAT :</td>
                  <td valign='middle'><select name='kdwasgiat' class='select-field' required='required'>
                         <option value='' selected>- - - - Pilih - - - -</option>";
-                $sql_wasgiat = "SELECT kdwasgiat, nmwasgiat FROM t_wasgiat ORDER BY kdwasgiat";
+                $sql_wasgiat = "SELECT kdwasgiat, nmwasgiat FROM t_wasgiat ORDER BY kdwasgiat ";
                 $qry_wasgiat = mysql_query($sql_wasgiat);
                 if (!$qry_wasgiat) { die("Kueri Wasgiat gagal: " . mysql_error()); }
                 while ($data_wasgiat = mysql_fetch_array($qry_wasgiat)){
@@ -171,6 +176,7 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
 		 </tr>
 
 		<div id="suggest">
+
 
 		    <tr><td class="subyek1" align="right">PROGRAM :</td>
 
@@ -232,7 +238,7 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
 			<tr>
 				 <td class="subyek1" align="right" >PAGU :</td>
 
-				 <td ><input name='pagu' type='hidden' value='<?php echo $p_pagu_raw; ?>' class='input-field' readonly/>
+				 <td ><input name='pagu' type='hidden' value='<?php echo $pagu_val_raw; ?>' class='input-field' readonly/>
 				      <input type='text' name='pagu_awal' onkeyup='formatPagu(this);replacePagu(document.form1.pagu_awal.value);' style='text-align: right;' value='<?php echo $pagu_formatted; ?>' class='input-field' autocomplete='off' onFocus='startCalc();' onBlur='stopCalc();'></td>
 			</tr>
 
@@ -266,7 +272,6 @@ $p_pagurevisi = isset($p['pagurevisi']) ? htmlspecialchars($p['pagurevisi']) : '
 <br><br>
 
 <script>
-// Fungsi JavaScript Anda (tidak ada perubahan signifikan)
 function suggest(inputString){
 	if(inputString.length == 0) {
 		$('#suggestions').fadeOut();
@@ -412,7 +417,5 @@ function startCalc(){
 
 </script>
 
-</head>
-<body>
 </body>
 </html>
